@@ -3,7 +3,7 @@
   "self_excluded": true,
   "path_base": "repository root",
   "license": "Apache-2.0",
-  "publication_status": "LOCAL_UNPUBLISHED_CANDIDATE",
+  "publication_status": "PUBLIC_RUNTIME_TRANSPORT_FIX",
   "files": [
     {
       "path": "runtime/LICENSE",
@@ -107,8 +107,8 @@
     },
     {
       "path": "runtime/scripts/cyberdeck-seam.mjs",
-      "bytes": 6038,
-      "sha256": "a8cad797a0a6d25d2df9d6b60dd28ea119b3b0b68edd17e9ea70be7c0f8a014f"
+      "bytes": 5968,
+      "sha256": "1449985f96e3e096b97c0e9596218bf609403aee244911587752390e477227e3"
     },
     {
       "path": "runtime/scripts/oss-bootstrap.mjs",
@@ -182,8 +182,8 @@
     },
     {
       "path": "runtime/src/inference.ts",
-      "bytes": 6651,
-      "sha256": "e88bdd7f48c1d39e19234eb0881e3e39b775eb319193668a364a3e47047e4cc0"
+      "bytes": 6610,
+      "sha256": "cedfc099f57c0e26debcdab2546339456bd5f53d5bb5b17ece661e2d1de7b4f6"
     },
     {
       "path": "runtime/src/integration.ts",
@@ -252,8 +252,8 @@
     },
     {
       "path": "runtime/src/plan-probe-worker.ts",
-      "bytes": 5839,
-      "sha256": "ff6f74fa55063237fce528481e34ac2f8b8333ab20aaee49de479f89e3981566"
+      "bytes": 5805,
+      "sha256": "9b65f886f8bbecd0548d76ce64853f6c8fa8c4cd7eef066c1f15237d90c623a9"
     },
     {
       "path": "runtime/src/publication-search.ts",
@@ -297,8 +297,8 @@
     },
     {
       "path": "runtime/tests/e05r1.test.mjs",
-      "bytes": 11016,
-      "sha256": "e35558943c98b414f50497b2d42a36bd2182fe5a0f4509b0752746f46b45d848"
+      "bytes": 12207,
+      "sha256": "cdbcedab3eae5c70e565174247a4ca5962740159b34fc3e9428990a659fa0959"
     },
     {
       "path": "runtime/tests/e05r2.test.mjs",
