@@ -40,7 +40,7 @@ export function validateCandidate(answer,packet){
 }
 export async function rehearse(packet,model,provider){
  const request=composeRequest(packet,model),response=await provider(request);
- if(!response.ok||!response.headers.get('content-type')?.includes('text/event-stream')||!response.body)throw Error('PROVIDER_UNCERTAIN');
+ if(!response.ok||!response.body)throw Error('PROVIDER_UNCERTAIN');
  const completed=await consumeResponse(response.body);
  return {request,answer:validateCandidate(JSON.parse(completed.text),packet)};
 }
