@@ -15,3 +15,7 @@ that implementations or provider compatibility have been qualified.
 The import gate checks a package identity and exact file allowlist, stages changes in
 a detached temporary worktree, runs local hygiene, and emits the final diff for owner
 review. It never pushes, deploys, authenticates to a provider, or changes main.
+
+## Published runtime
+
+The reviewed OSS runtime is now published byte-for-byte under `runtime/`. It is the software surface qualified by E05R2. Private research/evidence payloads remain excluded. Publication makes the source inspectable; it does not authorize dynamic registration, OAuth, plan usage, or deployment.

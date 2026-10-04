@@ -1,0 +1,2 @@
+// Synthetic empty release. Private payload intentionally excluded.
+export const pilotEvidencePayload = "{\"max_response_bytes\":65536,\"projection_status\":\"BOUND_READ_REPLICA\",\"records\":[],\"schema\":\"trognet-pilot-evidence/v1\",\"source\":{\"description\":\"No private corpus is distributed.\",\"snapshot\":\"synthetic-only\"},\"source_sha256\":\"3088054565bd64e0c1db31254e3a237a544425c6590f698df1bb6284eaac4a57\"}";

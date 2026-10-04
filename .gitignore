@@ -27,3 +27,11 @@ receipts/
 *.7z
 *.tar
 *.gz
+
+# Local enrollment material (never publish)
+host.json
+pending.json
+active.json
+enrollment.lock
+.enrollment-*.tmp
+*.bundle

@@ -1,40 +1,54 @@
 # TrogNet
 
 TrogNet is an independent, open-source EVE Echoes research/client project.
-This repository is in **pre-alpha / publication bootstrap**.
 
-## Current state: PUBLIC_SCAFFOLD
+## Current state: PUBLIC_RUNTIME
 
-The plan-integration runtime is being prepared separately and is **not available
-in this first scaffold commit**. No ChatGPT-plan authorization has been performed
-through this public repository. Repository existence does not establish OpenAI
-entitlement, plan-sharing eligibility, or approval of any integration.
+The reviewed OSS runtime is now public under [`runtime/`](runtime/).
 
-`PUBLICATION_STATE.json` is the machine-readable interlock: runtime publication,
-dynamic registration authorization, and live plan inference authorization are all
-false. There is no runnable client, OAuth flow, or deployment in this scaffold.
-The only executable tools here check publication hygiene and stage reviewed files.
+- Reviewed runtime source files: **68**
+- Publication candidate SHA-256: `30a277acf426cfdec9fd3ade9b63fceab3e417a186229f3a5ecb92aa053f93f7`
+- Dynamic registration authorized: **no**
+- Live ChatGPT-plan inference authorized: **no**
 
-Private research/evidence datasets are intentionally not distributed here. A future
-public runtime will consume user-supplied/local projections rather than bundle
-private data. The software is licensed under [Apache-2.0](LICENSE).
+The published runtime contains the OAuth/PKCE and credential-broker implementation,
+plan-only provider path, bounded evidence/request composition interfaces, schemas,
+deployment templates, synthetic tests, and owner bootstrap tooling that were qualified
+locally in E05R2.
 
-TrogNet is not affiliated with or endorsed by OpenAI, NetEase, CCP Games, or Cloudflare.
+Publishing the source does **not** establish OpenAI entitlement or permission to use a
+ChatGPT plan. Real `dynamic_agent_client` registration, owner OAuth authorization,
+remote-host qualification, unattended refresh, and live model calls remain separate
+explicit gates.
 
-## Publication and review
+Private research/evidence datasets are intentionally excluded. In particular, this
+repository does not distribute the recovered-client corpus, Master Codex source archives,
+E04B evidence payloads, Titan research datasets, blind holdout material, D1 data, account
+credentials, or owner receipts.
 
-- [Public/private boundary](docs/OPEN_SOURCE_BOUNDARY.md)
-- [Architecture and ownership](docs/ARCHITECTURE.md)
-- [Integration status](docs/PLAN_INTEGRATION_STATUS.md)
-- [Privacy and credentials](docs/PRIVACY_AND_CREDENTIALS.md)
-- [Reviewed runtime import](docs/E05R1_IMPORT_PLAN.md)
-- [Security](SECURITY.md), [contributing](CONTRIBUTING.md), and [trademarks](docs/TRADEMARKS.md)
+## Local build
 
-With Python 3.11 or later and Git installed, run the local publication check:
+From `runtime/`:
 
 ```sh
-python tools/publication_hygiene.py --root . --history
+npm ci --ignore-scripts
+npm test
+npm run bootstrap
 ```
 
-This uses the standard library, makes no network requests, and requires no secrets.
-Passing it is a mechanical check, not semantic approval or authorization to use a plan.
+The bootstrap command defaults to synthetic/offline fixtures. See
+[`runtime/OWNER_BOOTSTRAP_RUNBOOK.md`](runtime/OWNER_BOOTSTRAP_RUNBOOK.md) before any
+separately authorized live operation.
+
+## Publication and security
+
+- [Publication state](PUBLICATION_STATE.json)
+- [Runtime publication receipt](RUNTIME_PUBLICATION_RECEIPT.json)
+- [Public/private boundary](docs/OPEN_SOURCE_BOUNDARY.md)
+- [Architecture](docs/ARCHITECTURE.md)
+- [Plan integration status](docs/PLAN_INTEGRATION_STATUS.md)
+- [Privacy and credentials](docs/PRIVACY_AND_CREDENTIALS.md)
+- [Security](SECURITY.md)
+
+TrogNet is licensed under [Apache-2.0](LICENSE) and is not affiliated with or endorsed by
+OpenAI, NetEase, CCP Games, or Cloudflare.

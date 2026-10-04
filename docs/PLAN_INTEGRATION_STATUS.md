@@ -1,22 +1,29 @@
 # Plan integration status
 
-Repository phase: **PUBLIC_SCAFFOLD**.
+Repository phase: **PUBLIC_RUNTIME**.
 
 | Interlock | Value |
 | --- | --- |
-| runtime_published | false |
+| runtime_published | true |
 | dynamic_registration_authorized | false |
 | live_plan_inference_authorized | false |
 
-No runtime is included. No ChatGPT-plan authorization has been performed through
-this repository. No client ID has been assigned by this task. No plan sharing or
-provider entitlement is claimed.
+The reviewed E05R2 runtime source is publicly available under `runtime/`.
+Its publication candidate SHA-256 is
+`30a277acf426cfdec9fd3ade9b63fceab3e417a186229f3a5ecb92aa053f93f7`.
 
-Sequence: publish the shell; finish E05R1 qualification separately; review and import
-the exact candidate; verify the runtime source is actually public. Real
-dynamic_agent_client registration and Pro-plan qualification remain interlocked until
-that public-runtime prerequisite and separate owner/provider requirements are met.
+This publication closes the source-availability prerequisite only. It does not establish
+provider eligibility or authorize a client registration, OAuth grant, model call, remote
+deployment, or unattended refresh.
 
-The import tool preserves all three false flags. A later, separately reviewed
-publication-state change must reflect verified public source availability. Merely
-staging files, passing CI, or merging the import must not enable authorization flags.
+The next permitted sequence is:
+
+1. verify the exact public runtime and hygiene CI;
+2. perform one owner-controlled `dynamic_agent_client` registration using the published
+   runtime;
+3. validate the returned issued client ID, signed identity, scopes, and Pro-plan access;
+4. run one bounded owner-only plan probe;
+5. keep live inference disabled until those receipts are reviewed.
+
+Unattended renewal remains **NOT_LIVE_QUALIFIED** until the provider's
+`earliest_refresh_at` encoding/units are authoritative and covered by edge tests.

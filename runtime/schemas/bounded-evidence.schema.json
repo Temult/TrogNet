@@ -1,0 +1,58 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Bounded evidence packet",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "question",
+    "evidence",
+    "boundaries"
+  ],
+  "properties": {
+    "schema": {
+      "const": "trognet-bounded-evidence/v1"
+    },
+    "question": {
+      "type": "string",
+      "maxLength": 4000
+    },
+    "evidence": {
+      "type": "array",
+      "maxItems": 12,
+      "items": {
+        "type": "object",
+        "required": [
+          "id",
+          "kind",
+          "semantics",
+          "payload"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "kind": {
+            "enum": [
+              "accepted_knowledge",
+              "exact_evidence"
+            ]
+          },
+          "semantics": {
+            "type": "object"
+          },
+          "payload": {
+            "type": "object"
+          }
+        }
+      }
+    },
+    "boundaries": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    }
+  }
+}

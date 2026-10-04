@@ -1,0 +1,14 @@
+{
+  "schema": "trognet-runtime-publication-receipt/v1",
+  "repository": "Temult/TrogNet",
+  "runtime_path": "runtime/",
+  "file_count": 68,
+  "publication_candidate_sha256": "30a277acf426cfdec9fd3ade9b63fceab3e417a186229f3a5ecb92aa053f93f7",
+  "source_handoff": "TrogNet-E05R2-First-Sign-In-and-Publication-Join-Handoff-20261004",
+  "source_handoff_status": "LOCALLY_QUALIFIED",
+  "runtime_published": true,
+  "dynamic_registration_authorized": false,
+  "live_plan_inference_authorized": false,
+  "private_research_included": false,
+  "note": "Publication records source availability only; provider eligibility and live authorization remain separate gates."
+}

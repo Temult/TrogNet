@@ -1,0 +1,42 @@
+{
+  "compatibility_date": "2026-10-01",
+  "account_id": "REPLACE_VERIFIED_ACCOUNT_ID",
+  "workers_dev": false,
+  "preview_urls": false,
+  "observability": {
+    "enabled": false
+  },
+  "name": "trognet-e05-import",
+  "main": "dist/owner-broker-import.js",
+  "vars": {
+    "INFERENCE_MODE": "plan",
+    "INFERENCE_ENABLED": "false",
+    "PLAN_TIER": "pro",
+    "CREDITS_FALLBACK": "false",
+    "API_BILLING_APPROVED": "false",
+    "PLAN_CLIENT_ID": "REPLACE_ISSUED_OAIAPP_CLIENT_ID",
+    "BROKER_HOST_ID": "REPLACE_PERSISTED_REMOTE_UUID_URN",
+    "PLAN_OWNER_SUBJECT": "REPLACE_VERIFIED_OWNER_SUBJECT",
+    "PLAN_OWNER_EMAIL": "REPLACE_OWNER_EMAIL",
+    "PLAN_REMOTE_ELIGIBILITY_REF": "REPLACE_VERIFIED_OSS_REMOTE_ELIGIBILITY",
+    "PLAN_VISIBILITY_DECISION_REF": "REPLACE_OWNER_VISIBILITY_DECISION",
+    "PLAN_PRO_VERIFICATION_REF": "REPLACE_OWNER_PRO_VERIFICATION",
+    "PLAN_CREDITS_DISABLED_REF": "REPLACE_PROVIDER_CREDITS_DISABLED_VERIFICATION",
+    "PLAN_POLICY_EXPIRES_MS": "0",
+    "PUBLIC_ORIGIN": "https://REPLACE_OWNER_ONLY_HOST",
+    "ACCESS_ISSUER": "https://REPLACE_TEAM.cloudflareaccess.com",
+    "ACCESS_AUDIENCE": "REPLACE_OWNER_ONLY_AUDIENCE",
+    "IMPORT_ENABLED": "false",
+    "IMPORT_EXPIRES_MS": "0",
+    "BROKER_SESSION_EPOCH": "0"
+  },
+  "durable_objects": {
+    "bindings": [
+      {
+        "name": "BROKER",
+        "class_name": "PlanCredentialBroker",
+        "script_name": "trognet-e05-broker"
+      }
+    ]
+  }
+}

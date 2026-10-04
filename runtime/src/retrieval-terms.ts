@@ -1,0 +1,3 @@
+const STOP=new Set('the a an is are was were how what when does do can i you my to of for in on and or this that it with from me tell about actually why which than has have be at as its there those these will would could should use using please give each much'.split(' '));
+const ALIASES:Record<string,string[]>={cap:['capacitor'],ammo:['ammunition'],sniper:['tactics'],heat:['heavy','cannon'],web:['stasis','resistance'],qt:['hit','quality']};
+export function queryTerms(question:string):string[]{const tokens=(question.toLowerCase().match(/[a-z0-9_]{2,64}/g)??[]).filter(x=>!STOP.has(x)).slice(0,20);return [...new Set(tokens.flatMap(t=>[t,...(ALIASES[t]??[])]))].slice(0,24);}

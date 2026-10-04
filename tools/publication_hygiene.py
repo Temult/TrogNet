@@ -88,11 +88,17 @@ def check(root, history=False):
         state = json.loads((root / 'PUBLICATION_STATE.json').read_text(encoding='utf-8'))
         if state.get('schema') != 'trognet-publication-state/v1':
             raise ValueError('schema')
-        if state.get('repository_phase') != 'PUBLIC_SCAFFOLD':
-            raise ValueError('phase requires separately reviewed gate update')
-        for key in ('runtime_published', 'dynamic_registration_authorized', 'live_plan_inference_authorized'):
-            if state.get(key) is not False:
+        phase = state.get('repository_phase')
+        if phase == 'PUBLIC_SCAFFOLD':
+            if any(state.get(k) is not False for k in ('runtime_published','dynamic_registration_authorized','live_plan_inference_authorized')):
                 raise ValueError('interlock')
+        elif phase == 'PUBLIC_RUNTIME':
+            if state.get('runtime_published') is not True:
+                raise ValueError('runtime publication state')
+            if state.get('dynamic_registration_authorized') is not False or state.get('live_plan_inference_authorized') is not False:
+                raise ValueError('authorization interlock')
+        else:
+            raise ValueError('phase requires separately reviewed gate update')
     except (OSError, ValueError, AttributeError):
         findings.append({'path': 'PUBLICATION_STATE.json', 'rule': 'invalid-state-or-interlock'})
     license_path = root / 'LICENSE'

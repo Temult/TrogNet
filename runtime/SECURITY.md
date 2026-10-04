@@ -1,0 +1,11 @@
+# Security model
+
+Do not send tokens in issues, logs, URLs, model input or browser payloads. Report a security concern privately through a channel chosen by the maintainer before publication; no address is invented here.
+
+The sole refresh writer is the encrypted broker. Refresh dispatch is durably marked before effects; ambiguous refresh persistence requires reconnect and never replays the old rotating token. Reauthorization preserves host/client/subject, increments epoch and invalidates qualification. Local bootstrap persists minimal pending issued registration before exchange; only verified identity and explicit owner confirmation permit an atomic active record. The active record retains the ID token encrypted both in protected hint storage and sealed broker state. State, nonce, code and PKCE verifier remain transient. New ID tokens require signature, issuer, audience, nonce and expiry checks; returning subject and client must match exactly. Workspace binding belongs to the provider-issued registration. Optional opaque metadata is not interpreted and no custom workspace claim is required. Hint URLs must be redacted and a hint never authenticates a new grant.
+
+The import aperture requires Access, owner, exact origin, a temporary secret, expiry and a preauthorized sealed-bundle digest. Close it after import, remove the temporary route and secret, preserve broker storage. Routine browser sessions authenticate with Access only. No inference or deployment is performed by bootstrap. Owner Pro and credits-disabled checks expire; config attestations are not cryptographic billing evidence.
+
+Public receipt checks are an owner-reviewed publication interlock, not proof fetched from a host or a guarantee of provider eligibility. The owner must bind its source digest to the reviewed publication manifest and verify license, public availability and applicable remote-host policy. No receipt is shipped.
+
+Provider input scans reject known path/token/evaluator fields. All payloads are bounded and evidence is never truncated to fit. These checks do not detect every possible secret or prose-level authority promotion. No free-text truth, model quality, live server parity or independent security audit is claimed. Dependencies are locked; no dependency audit network request was run in this delivery.

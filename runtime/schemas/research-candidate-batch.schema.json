@@ -1,0 +1,86 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:somner:librarian:research-candidate-batch:v1",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "schema": {
+      "const": "librarian-research-candidate-batch/v1"
+    },
+    "execution_authority": {
+      "const": "none"
+    },
+    "source_snapshot_sha256": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "has_more": {
+      "type": "boolean"
+    },
+    "candidates": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "candidate_id": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
+          },
+          "source_interaction_id": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
+          },
+          "release_id": {
+            "type": "string",
+            "maxLength": 4000
+          },
+          "untrusted_question": {
+            "type": "string",
+            "maxLength": 4000
+          },
+          "fingerprint": {
+            "type": "string",
+            "pattern": "^[a-f0-9]{64}$"
+          },
+          "evidence_chunk_ids": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "maxLength": 4000
+            },
+            "maxItems": 8
+          },
+          "requested_disposition": {
+            "const": "owner_triage_only"
+          },
+          "promotion_allowed": {
+            "const": false
+          },
+          "execute_allowed": {
+            "const": false
+          }
+        },
+        "required": [
+          "candidate_id",
+          "source_interaction_id",
+          "release_id",
+          "untrusted_question",
+          "fingerprint",
+          "evidence_chunk_ids",
+          "requested_disposition",
+          "promotion_allowed",
+          "execute_allowed"
+        ]
+      },
+      "maxItems": 1000
+    }
+  },
+  "required": [
+    "schema",
+    "execution_authority",
+    "source_snapshot_sha256",
+    "has_more",
+    "candidates"
+  ]
+}

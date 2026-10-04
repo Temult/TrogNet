@@ -13,3 +13,7 @@ If a credential is exposed, revoke or rotate it at its issuer immediately. Remov
 a file or commit alone does not revoke a credential. Do not paste credentials into
 issues, pull requests, logs, scan reports, or examples. Hygiene reports contain rule
 names and relative file names, never matching secret values.
+
+## Published runtime
+
+The `runtime/` source is public, but no live OAuth credential, client grant, Cloudflare secret, private evidence bundle, D1 contents, or account token belongs in this repository. Dynamic registration and live plan inference remain separately gated.

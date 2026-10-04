@@ -1,5 +1,9 @@
 # Public/private boundary
 
+## Publication status
+
+The reviewed 68-file runtime source is public under `runtime/`. The boundary below continues to exclude all private research, evidence payloads, credentials, account state, and blind-evaluation material.
+
 ## Intended public software, only after E05R1 review
 
 - Sign in with ChatGPT / OAuth protocol code.

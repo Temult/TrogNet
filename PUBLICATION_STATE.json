@@ -1,7 +1,7 @@
 {
   "schema": "trognet-publication-state/v1",
-  "repository_phase": "PUBLIC_SCAFFOLD",
-  "runtime_published": false,
+  "repository_phase": "PUBLIC_RUNTIME",
+  "runtime_published": true,
   "dynamic_registration_authorized": false,
   "live_plan_inference_authorized": false
 }

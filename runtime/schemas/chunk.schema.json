@@ -1,0 +1,131 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:somner:librarian:chunk:v1",
+  "title": "Librarian evidence publication chunk",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "chunk_id",
+    "release_id",
+    "document_id",
+    "heading",
+    "body",
+    "snapshot_id",
+    "fidelity",
+    "source_file",
+    "source_sha256",
+    "source_span_sha256",
+    "body_sha256",
+    "start_line",
+    "end_line",
+    "assumptions",
+    "unresolved",
+    "tags",
+    "publication",
+    "layer",
+    "authority"
+  ],
+  "properties": {
+    "chunk_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "release_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "document_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "heading": {
+      "type": "string",
+      "minLength": 1
+    },
+    "body": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 2500
+    },
+    "snapshot_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "fidelity": {
+      "type": "string",
+      "minLength": 1
+    },
+    "source_file": {
+      "type": "string",
+      "minLength": 1,
+      "pattern": "^[^/\\\\]+$"
+    },
+    "source_sha256": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "source_span_sha256": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "body_sha256": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "start_line": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "end_line": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "assumptions": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "maxItems": 20
+    },
+    "unresolved": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "maxItems": 20
+    },
+    "tags": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "maxItems": 20
+    },
+    "publication": {
+      "enum": [
+        "fixture_only",
+        "tester_approved"
+      ]
+    },
+    "layer": {
+      "enum": [
+        "source_evidence",
+        "mechanics_claim",
+        "simulation_result",
+        "research_report",
+        "boundary_note"
+      ]
+    },
+    "authority": {
+      "enum": [
+        "client",
+        "server",
+        "conditional_model",
+        "report_only"
+      ]
+    }
+  }
+}

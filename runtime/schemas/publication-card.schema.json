@@ -1,0 +1,236 @@
+{
+  "$id": "urn:echoes:librarian:publication-card:v1",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "class": {
+            "const": "DERIVED"
+          }
+        }
+      },
+      "then": {
+        "required": [
+          "inputs",
+          "formula"
+        ]
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "class": {
+            "const": "MODEL"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "assumptions": {
+            "items": {
+              "minLength": 1,
+              "type": "string"
+            },
+            "minItems": 1,
+            "type": "array"
+          }
+        },
+        "required": [
+          "assumptions"
+        ]
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "class": {
+            "const": "OBSERVED"
+          }
+        }
+      },
+      "then": {
+        "required": [
+          "environment"
+        ]
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "class": {
+            "const": "OPEN"
+          }
+        }
+      },
+      "then": {
+        "required": [
+          "open_boundary"
+        ]
+      }
+    }
+  ],
+  "properties": {
+    "assumptions": {
+      "items": {
+        "minLength": 1,
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "card_id": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "class": {
+      "enum": [
+        "SOURCE",
+        "DERIVED",
+        "MODEL",
+        "OBSERVED",
+        "OPEN"
+      ]
+    },
+    "entities": {
+      "items": {
+        "minLength": 1,
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "environment": {
+      "properties": {
+        "conditions": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "observation_id": {
+          "minLength": 1,
+          "type": "string"
+        }
+      },
+      "required": [
+        "conditions",
+        "observation_id"
+      ],
+      "type": "object"
+    },
+    "formula": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "inputs": {
+      "items": {
+        "type": "object"
+      },
+      "minItems": 1,
+      "type": "array"
+    },
+    "legacy": {
+      "type": "object"
+    },
+    "limitations": {
+      "items": {
+        "minLength": 1,
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "open_boundary": {
+      "properties": {
+        "closes_with": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "question": {
+          "minLength": 1,
+          "type": "string"
+        }
+      },
+      "required": [
+        "question",
+        "closes_with"
+      ],
+      "type": "object"
+    },
+    "publication": {
+      "const": "candidate_only"
+    },
+    "required_cards": {
+      "items": {
+        "minLength": 1,
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "schema": {
+      "const": "echoes-publication-card/v1"
+    },
+    "scope": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "snapshot": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "source_artifact": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "source_refs": {
+      "items": {
+        "minLength": 1,
+        "type": "string"
+      },
+      "minItems": 1,
+      "type": "array"
+    },
+    "statement": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "superseded_by": {
+      "items": {
+        "minLength": 1,
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "supersedes": {
+      "items": {
+        "minLength": 1,
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "title": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "topics": {
+      "items": {
+        "minLength": 1,
+        "type": "string"
+      },
+      "type": "array"
+    }
+  },
+  "required": [
+    "schema",
+    "card_id",
+    "class",
+    "title",
+    "statement",
+    "snapshot",
+    "scope",
+    "entities",
+    "topics",
+    "source_refs",
+    "source_artifact",
+    "limitations",
+    "publication"
+  ],
+  "type": "object"
+}

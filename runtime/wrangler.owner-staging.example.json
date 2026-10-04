@@ -1,0 +1,28 @@
+{
+  "name": "echoes-librarian-owner-staging",
+  "main": "dist/owner-staging.js",
+  "compatibility_date": "2026-10-01",
+  "account_id": "REPLACE_WITH_VERIFIED_ACCOUNT_ID",
+  "workers_dev": true,
+  "preview_urls": false,
+  "assets": {
+    "directory": "./public",
+    "binding": "ASSETS",
+    "run_worker_first": true
+  },
+  "vars": {
+    "PUBLIC_ORIGIN": "https://echoes-librarian-owner-staging.REPLACE_ACCOUNT_SUBDOMAIN.workers.dev",
+    "ACCESS_ISSUER": "https://REPLACE_TEAM.cloudflareaccess.com",
+    "ACCESS_AUDIENCE": "REPLACE_WITH_OWNER_ONLY_ACCESS_APPLICATION_AUDIENCE",
+    "INFERENCE_MODE": "extractive",
+    "INFERENCE_ENABLED": "false"
+  },
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "echoes-librarian-owner-staging",
+      "database_id": "REPLACE_WITH_NEW_D1_DATABASE_ID",
+      "migrations_dir": "migrations"
+    }
+  ]
+}

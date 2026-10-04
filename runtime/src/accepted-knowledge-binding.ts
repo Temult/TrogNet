@@ -1,0 +1,2 @@
+// Synthetic-only pin. Never a private release identity.
+export const acceptedKnowledgeBinding = {"claim_count":0,"namespace":"synthetic-only","package_sha256":"de98858e30e441360c33c06443d00e766ff71bc61023965db78eb81aad0d62ae","payload_sha256":"02c6713475710d170229951dbdd14409132c990b6af96ea7f6dacd2aa1ce4afd","schema":"echoessom-accepted-knowledge-read/v1-candidate","source_sha256":"de98858e30e441360c33c06443d00e766ff71bc61023965db78eb81aad0d62ae"} as const;
