@@ -7,6 +7,7 @@ import {BrokerCore,openToken,sealToken} from '../dist/credential-broker.js';
 import {discoverPlanModel} from '../dist/oss-plan-staging.js';
 import {brokerIdentity,PlanCredentialBroker} from '../dist/plan-broker.js';
 import {sha256} from '../dist/util.js';
+import {ProbeCore} from '../dist/plan-probe-worker.js';
 import {composePacket,composeRequest,validateCandidate,rehearse,assertProviderSafe} from '../scripts/cyberdeck-seam.mjs';
 const run=async(change={},extra={})=>{const f=await fakeOAuth(change);return bootstrapSession({identity:identity(),callback:f.callback,fetcher:f.fetcher,now:NOW,savePending:async()=>{},confirmIdentity:async()=>true,commitActive:async r=>{if(extra.saveIdentity)await extra.saveIdentity(r.identity);},protectHint:(v,r)=>protectLoginHint(v,KEY,r),seal:async t=>t,...extra});};
 test('E05R1 first use selects dynamic registration and stable TrogNet hint',async()=>{
@@ -72,11 +73,21 @@ const answer=p=>({answer_class:'unknown',paragraphs:[{text:'The fixture remains 
 test('E05R1 fabricated evidence and detectable OPEN/MODEL/OBSERVED promotion rejected',()=>{
  for(const kind of ['OPEN','MODEL','OBSERVED']){const p=syntheticPacket();p.evidence[0].semantics.native_class=kind;const a=answer(p);assert.deepEqual(validateCandidate(a,p),a);for(const mutate of [x=>x.paragraphs[0].citations[0].id='X:fabricated',x=>x.paragraphs[0].citations[0].semantics.native_class='SOURCE',x=>x.boundaries=[],x=>x.answer_class='evidence_summary',x=>x.research_needed=false]){const bad=structuredClone(a);mutate(bad);assert.throws(()=>validateCandidate(bad,p));}}
 });
-test('E05R1 completed SSE parses; incomplete stream rejects',async()=>{
+test('E05R1 completed SSE parses without Content-Type; incomplete stream rejects',async()=>{
  const p=syntheticPacket(),a=answer(p),event=(type,data)=>'data: '+JSON.stringify({type,...data})+'\n\n';
  const text=event('response.output_text.delta',{delta:JSON.stringify(a)}),done=event('response.completed',{response:{status:'completed'}});
- const provider=async request=>{assert(!('max_output_tokens'in request));assert.equal(request.store,false);return new Response(text+done,{headers:{'Content-Type':'text/event-stream'}});};assert.deepEqual((await rehearse(p,'fixture-model',provider)).answer,a);
- await assert.rejects(rehearse(p,'fixture-model',async()=>new Response(text,{headers:{'Content-Type':'text/event-stream'}})));
+ const provider=async request=>{assert(!('max_output_tokens'in request));assert.equal(request.store,false);return new Response(text+done);};assert.deepEqual((await rehearse(p,'fixture-model',provider)).answer,a);
+ await assert.rejects(rehearse(p,'fixture-model',async()=>new Response(text)));
+ await assert.rejects(rehearse(p,'fixture-model',async()=>Response.json({status:'completed'})));
+});
+test('E05R3 one-shot ProbeCore accepts completed SSE without Content-Type',async()=>{
+ const event=(type,data)=>'data: '+JSON.stringify({type,...data})+'\n\n';
+ const body=event('response.output_text.delta',{delta:'LIBRARIAN_PROBE_OK'})+event('response.completed',{response:{status:'completed'}});
+ const env={...planConfig(),P0_ENABLED:'true',P0_OWNER_EMAIL:['owner','example.invalid'].join('@'),P0_PROBE_ID:'transport-no-content-type',P0_MODEL:'gpt-fixture',MODEL:'gpt-fixture',P0_ACCESS_TOKEN:undefined};
+ const store=new MemoryStore();let calls=0;
+ const fetcher=async(url,init)=>{calls++;if(String(url).endsWith('/v1/models'))return Response.json({models:[{slug:'gpt-fixture',visibility:'list'}]});assert(String(url).endsWith('/v1/responses'));assert.equal(init.headers.Accept,'text/event-stream');return new Response(body);};
+ const core=new ProbeCore(store,env,fetcher,async()=> 'PLACEHOLDER_BROKER_TOKEN','fixture-context');
+ const result=await core.run();assert.equal(result.status,'PASS');assert.equal(result.response_completed,true);assert.equal(result.expected_text,true);assert.equal(calls,2);
 });
 for(const bad of [{access_token:'fixture'}, {refresh_token:'fixture'}, {id_token:'fixture'}, {hidden_evaluator:{}}, {text:'C:\\private\\secret'}, {text:['','home','private','file'].join('/')}, {text:'Bearer '+'fixture-only'}])test('E05R1 provider input rejects '+Object.keys(bad)[0]+' '+JSON.stringify(bad).length,()=>assert.throws(()=>assertProviderSafe(bad)));
 test('E05R1 composer rejects oversized whole packets without truncation',async()=>{
