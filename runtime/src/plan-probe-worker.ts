@@ -24,7 +24,7 @@ export class ProbeCore {
   await this.store.put('receipt',receipt);
   try{
    const token=this.tokenSource?await this.tokenSource():env.P0_ACCESS_TOKEN;
-   const headers={Authorization:'Bearer '+token,'Content-Type':'application/json'};
+   const headers={Authorization:'Bearer '+token,'Content-Type':'application/json','Accept':'text/event-stream'};
    const m=await this.fetcher('https://api.openai.com/v1/models',{headers,redirect:'error',signal:AbortSignal.timeout(15000)});
    if(!m.ok){receipt.status='BLOCKED';receipt.diagnostic=await safeProviderDiagnostic(m);}
    else{
@@ -34,7 +34,7 @@ export class ProbeCore {
     const r=await this.fetcher('https://api.openai.com/v1/responses',{method:'POST',headers,redirect:'error',signal:AbortSignal.timeout(30000),body:JSON.stringify({model:env.P0_MODEL,store:false,stream:true,instructions:'Reply with exactly LIBRARIAN_PROBE_OK. No tools.',input:[{role:'user',content:'Connectivity verification.'}]})});
     if(!r.ok){receipt.status=r.status>=500?'UNKNOWN':'BLOCKED';receipt.diagnostic=await safeProviderDiagnostic(r);}
     else{
-     if(!r.body||!r.headers.get('Content-Type')?.includes('text/event-stream'))throw new Error('protocol');
+     if(!r.body)throw new Error('protocol');
      const result=await consumeResponse(r.body,4096);receipt.response_completed=true;receipt.expected_text=result.text.trim()==='LIBRARIAN_PROBE_OK';receipt.status=receipt.expected_text?'PASS':'BLOCKED';
     }
    }
