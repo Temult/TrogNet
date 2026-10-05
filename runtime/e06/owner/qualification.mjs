@@ -37,7 +37,7 @@ export async function qualifyOnce({model,models,authorize,attestation,storage=lo
         receipt.gateway_request_sha256=b.gateway_request_sha256;
         if(r.status===200&&b.status==='completed'&&b.gateway_completion===true&&b.inference==='confirmed') {
           receipt.inference='confirmed';receipt.gateway_completion=true;
-          receipt.route_stages=['browser','authenticated_worker','durable_attempt','configured_tunnel_origin','gateway_completion'];
+          receipt.route_stages=['browser','authenticated_worker','durable_attempt','configured_vpc_service','gateway_completion'];
           receipt.answer_sha256=await sha(b.text);receipt.status=b.text.trim()==='OK'?'PASS_PENDING_OWNER_PATH_CORRELATION':'STOP_ANSWER_MISMATCH';
         } else if(b.status==='not_dispatched'&&b.inference==='no'){receipt.inference='no';receipt.status='STOP_NOT_DISPATCHED';}
       }

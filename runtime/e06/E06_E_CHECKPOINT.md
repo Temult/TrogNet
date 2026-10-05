@@ -6,13 +6,14 @@ origin, calls visibleModels(), explicitly chooses the visible GPT-6 Astra slug, 
 calls qualifyOnce with the exact one-inference authorization and reviewed deployment
 attestation. No hard-coded slug substitutes for the account catalog.
 
-Prerequisites: Gate 5I PASS is now supplied by its owner and included as reconciled evidence; Tailscale SSH proof, reviewed OCI
-SSH ingress removal, installed source/manifest verification, offline fence migration,
-Tunnel health proof, Access owner policy and pinned JWT keys, deployed Worker binding
-to the permanent single DO namespace, no fallback/old token broker binding, and
-successful authenticated /e06/models. All remain owner operations.
+E06R1 prerequisites: preserve prior owner Gate 5I evidence, current generation-2 state,
+Tailscale-only administration and already-active permanent fence. Do not rerun migration.
+Owner must verify installed source, existing VPC Service target and connector health,
+Access protection on workers.dev, pinned JWT keys and permanent DO namespace continuity.
+No public origin hostname is involved. Successful authenticated /e06/models is a future
+separately authorized owner operation, not performed by this source repair.
 
-Exactly ONE provider inference is permitted. A browser lock and persisted attempt
+Only under separate explicit owner authorization is ONE provider inference permitted. A browser lock and persisted attempt
 marker precede POST. The Durable Object independently suppresses duplicate canonical
 intent across tabs or browser storage loss. The helper has no new-attempt or reset
 operation. Any further attempt requires separate explicit owner authorization and

@@ -1,4 +1,11 @@
-# E06 executive summary
+# E06 executive summary — E06R1 transport revision
+
+E06R1 uses the Access-protected workers.dev front door and a mandatory PRIVATE_GATEWAY
+Workers VPC Service binding. Legacy ORIGIN_URL fails closed. No custom DNS zone or
+public origin hostname is required. Owner verifies the existing service target before
+live inference; Workers VPC beta/account behavior remains OPEN. See CURRENT_BASELINE.md.
+
+The paragraphs below summarize inherited E06 behavior; prior test counts are historical.
 
 Implemented a parallel owner-authenticated Cloudflare front door, durable attempt/intent
 coordination, permanent origin replay fencing, a prepared Oracle/Tailscale/Tunnel owner

@@ -2,8 +2,18 @@
 
 Separate modules under runtime/e06 add the front door, persistent coordinator, replay
 fence migration and owner kit. Existing Portal, extractive rollback, publication/evidence
-readers, OAuth grant logic and refresh schedule are unchanged. The only modified
-existing runtime files are gateway.mjs and protected-store.mjs (plus source manifest).
+readers, OAuth grant logic and refresh schedule are unchanged. The original E06 gateway/protected-store changes are inherited without modification.
+E06R1 changes only E06 front-door transport, its tests/configuration, materially stale
+E06 documentation and the source manifest. No gateway, broker, fence or timeout code changes.
+
+PRIVATE_GATEWAY.fetch is mandatory at both front-door and coordinator boundaries.
+ORIGIN_URL presence fails closed, including empty/undefined values. Coordinator origin
+calls enforce the two exact gateway paths and use a fixed synthetic HTTP URL, preserving
+Accept and X-TrogNet-Admission plus Content-Type and X-TrogNet-Request-Id for responses.
+No incoming URL, query, Host, cookie, JWT or arbitrary header is copied. A binding failure
+retains the existing uncertainty semantics. The constructor no longer accepts a fetcher
+transport override; tests inject the binding itself. The registered VPC Service selects
+the actual destination, not the synthetic host. Real account behavior remains OPEN.
 
 The gateway now reserves via reserveGatewayRequest, preserving the original legacy
 hash ledger until explicit offline migration. Sequenced mode requires the fence and

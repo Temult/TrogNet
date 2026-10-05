@@ -5,7 +5,11 @@
 Browser -> Access authenticates the session; Worker independently verifies the signed
 application JWT and exact owner subject. Email/header assertions alone confer no access.
 Worker -> single Durable Object owns admission and persistence. Durable Object -> fixed
-HTTPS Tunnel hostname uses only ORIGIN_ADMISSION. Tunnel -> loopback gateway crosses
+PRIVATE_GATEWAY Workers VPC Service uses only ORIGIN_ADMISSION. The binding selects
+the registered service; its owner-configured target must be verified independently.
+The synthetic HTTP host cannot select a target. Legacy ORIGIN_URL is rejected and no
+global fetch fallback exists. Access protects the workers.dev browser front door; no
+public origin hostname/custom DNS zone is required. Tunnel -> loopback gateway crosses
 no public OCI application port. Gateway -> provider is the existing plan-backed path.
 Oracle alone holds provider credentials. Same-UID/root or a compromised Cloudflare
 account controlling code/config is outside this application's attacker boundary.

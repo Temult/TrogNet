@@ -1,31 +1,24 @@
-# Open boundaries and next steps
+# E06R1 open boundaries
 
-- Gate 5I independently completed PASS after the worker handoff. Preserve its receipt; do not call /qualify, rotate, schedule or reproduce it merely to reconfirm the prerequisite.
-- E06 is implemented and deterministically tested locally; LIVE_QUALIFIED is false.
-- Cloudflare Access policy, public-key pins, hostname, Worker/DO binding and Tunnel
-  behavior need owner deployment review and live qualification. No real platform
-  compatibility or account entitlement claim follows from the storage test double.
-- The supplied owner kit is review-ready with placeholders. Installation, network changes,
-  memory sufficiency and rollback need target-host owner verification. No SSH was used.
-- The 2048-attempt front-door ledger stops rather than evicts. A future safe compaction
-  or disaster-recovery protocol requires separate review. Do not reset the DO namespace
-  or sequence/fence state. The origin 512-entry exhaustion problem has a permanent fence
-  protocol; it is not solved by deleting history.
-- Request hashes correlate a trusted reviewed gateway result; they are not independently
-  signed provider attestations or billing proof. Final qualification needs source/route
-  inspection and sanitized origin correlation in addition to the browser receipt.
-- Provider HTTP rejection remains uncertain without separate authoritative no-inference
-  proof. The implementation never promotes status codes into safe replay permission.
-- Canonical payload equality detects identical intents; paraphrases, changed models or
-  changed instructions are distinct. No semantic duplicate detector is claimed.
-- Access signing-key rotation requires an owner pin update. No fallback issuer/key fetch.
-- No production binding replaces the extractive Portal. Retiring it remains a later gate.
-- No private blind-holdout data was inspected. No toolkit assumptions override E06.
+- Local source repair and synthetic Linux tests do not establish LIVE_QUALIFIED.
+- Workers VPC is beta. Actual account availability, service routing, fetch/header/Host
+  behavior, timeouts and resource limits require owner qualification.
+- Service existence and intended HTTP 127.0.0.1:19456 through trognet-origin are supplied
+  owner context. Independently verify type, tunnel, IPv4 and port before live inference.
+- Effective workers.dev Access policy, trusted public keys, exact owner claims, Worker
+  deployment and permanent REQUESTS namespace continuity require owner verification.
+- Preserve owner-supplied generation-2 authority and active permanent fence. Do not
+  reproduce Gate 5I, archival or host/tunnel setup as part of this repair.
+- The 2048-attempt DO limit stops without eviction. Compaction/disaster recovery remains
+  separate work. Never reset namespaces, sequence state or credential envelopes.
+- Completion hashes correlate reviewed gateway results; they are not provider-signed
+  attestations or billing proof. Reservation and HTTP status alone do not prove inference.
+- Transport failure/provider rejection remains uncertain; no implicit retries. Canonical
+  payload equality does not detect semantically equivalent paraphrases.
+- The old extractive Portal and its routes remain unchanged as rollback. Product adoption
+  or retirement requires a separate decision. No blind holdout material was inspected.
 
-## NOT EXECUTED
-
-E06 live Oracle/SSH mutation; E06 gateway /responses or /qualify; OAuth/login initiated by E06;
-credential inspection/rotation; Cloudflare account/API/Access/Worker/Tunnel operations;
-DNS/D1/OCI/Tailscale changes; public SSH closure; owner installation scripts; live
-qualification or inference; inference spending; GitHub configuration mutations; commits;
-pushes. Local synthetic test providers are not live inference.
+NOT_RUN: deployment, pushes, Oracle/SSH operations, tunnel/token/service mutation,
+VPC Service or Access policy changes, DNS/custom domains, D1, live catalog, /responses,
+/qualify, OAuth, credential rotation, provider calls and live qualification/inference.
+See OWNER_EXECUTION_ORDER.md for the exact future owner sequence.

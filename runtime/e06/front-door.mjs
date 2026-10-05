@@ -40,11 +40,12 @@ export function payload(p) {
 }
 function configuration(env) {
   if(env.ENABLED!=='true'||['OPENAI_API_KEY','CREDITS_FALLBACK','TOKEN_ENCRYPTION_KEY','OWNER_ADMISSION','ACCESS_TOKEN','REFRESH_TOKEN'].some(k=>Object.hasOwn(env,k)))fail('FRONT_DOOR_UNAVAILABLE',503);
-  for(const name of ['APP_ORIGIN','ORIGIN_URL']) {
+  if(Object.hasOwn(env,'ORIGIN_URL')||typeof env.PRIVATE_GATEWAY?.fetch!=='function')fail('FRONT_DOOR_UNAVAILABLE',503);
+  for(const name of ['APP_ORIGIN']) {
     let u;try{u=new URL(env[name]);}catch{fail('FRONT_DOOR_UNAVAILABLE',503);}
     if(u.protocol!=='https:'||u.origin!==env[name]||u.username||u.password||u.port||u.hostname.endsWith('.invalid'))fail('FRONT_DOOR_UNAVAILABLE',503);
   }
-  if(env.APP_ORIGIN===env.ORIGIN_URL||!/^https:\/\/[a-z0-9-]+\.cloudflareaccess\.com$/.test(env.ACCESS_ISSUER)||!str(env.ACCESS_AUDIENCE,256)||!str(env.OWNER_SUBJECT,256)||
+  if(!/^https:\/\/[a-z0-9-]+\.cloudflareaccess\.com$/.test(env.ACCESS_ISSUER)||!str(env.ACCESS_AUDIENCE,256)||!str(env.OWNER_SUBJECT,256)||
      !/^[-A-Za-z0-9_]{32,128}$/.test(env.ORIGIN_ADMISSION??'')||typeof env.ACCESS_PUBLIC_KEYS!=='string'||env.ACCESS_PUBLIC_KEYS.length>16384)fail('FRONT_DOOR_UNAVAILABLE',503);
 }
 function headers(request) {
@@ -99,7 +100,7 @@ export default {fetch:frontDoor};
 
 /** One durable admission coordinator. No timers, alarms, retry queues or provider credentials. */
 export class RequestCoordinator {
-  constructor(state,env,{fetcher=fetch,timeoutMs=115000}={}) {this.state=state;this.env=env;this.busy=false;this.fetcher=fetcher;this.timeoutMs=timeoutMs;}
+  constructor(state,env,{timeoutMs=115000}={}) {this.state=state;this.env=env;this.busy=false;this.timeoutMs=timeoutMs;}
   async fetch(request) {
     try {
       configuration(this.env);
@@ -128,10 +129,13 @@ export class RequestCoordinator {
       new_attempt_requires_consent:true};
   }
   async origin(path,body,gatewayId) {
+    configuration(this.env);
+    if(!['/models','/responses'].includes(path))fail('INVALID_REQUEST');
     return timed(async signal=>{
       const h={'Accept':'application/json','X-TrogNet-Admission':this.env.ORIGIN_ADMISSION};
       if(body){h['Content-Type']='application/json';h['X-TrogNet-Request-Id']=gatewayId;}
-      const r=await this.fetcher(this.env.ORIGIN_URL+path,{method:body?'POST':'GET',headers:h,body:body?JSON.stringify(body):undefined,redirect:'error',signal});
+      // Synthetic HTTP URL/Host only; the registered VPC Service fixes the target.
+      const r=await this.env.PRIVATE_GATEWAY.fetch('http://private-gateway.invalid'+path,{method:body?'POST':'GET',headers:h,body:body?JSON.stringify(body):undefined,redirect:'error',signal});
       if(r.headers.get('content-type')?.split(';')[0].trim()!=='application/json')throw Error('UPSTREAM_REJECTED');
       const b=await boundedJSON(r,262144,signal);
       const raw=JSON.stringify(b);

@@ -15,7 +15,7 @@ import {REQUIRED_SCOPES} from '../self-hosted/migrate.mjs';
 
 const p=()=>({model:'fixture-model',instructions:'Answer briefly.',input:[{role:'user',content:'Fixture question'}],store:false,stream:true});
 const rid=n=>'fixture-request-'+String(n).padStart(4,'0');
-const envBase={ENABLED:'true',APP_ORIGIN:'https://app.example.com',ORIGIN_URL:'https://origin.example.com',ACCESS_ISSUER:'https://fixture.cloudflareaccess.com',ACCESS_AUDIENCE:'fixture-audience',OWNER_SUBJECT:'fixture-owner',ORIGIN_ADMISSION:'PLACEHOLDER_ORIGIN_ADMISSION_ONLY_12345'};
+const envBase={ENABLED:'true',APP_ORIGIN:'https://app.example.com',ACCESS_ISSUER:'https://fixture.cloudflareaccess.com',ACCESS_AUDIENCE:'fixture-audience',OWNER_SUBJECT:'fixture-owner',ORIGIN_ADMISSION:'PLACEHOLDER_ORIGIN_ADMISSION_ONLY_12345'};
 const b64=b=>Buffer.from(b).toString('base64url');
 const pair=await crypto.subtle.generateKey({name:'RSASSA-PKCS1-v1_5',modulusLength:2048,publicExponent:new Uint8Array([1,0,1]),hash:'SHA-256'},true,['sign','verify']);
 const jwk={...await crypto.subtle.exportKey('jwk',pair.publicKey),kid:'fixture-key',alg:'RS256'};
@@ -34,14 +34,58 @@ class Storage {
 function fixture(provider,options={}) {
   const storage=new Storage(),calls=[];
   const fetcher=async(u,i)=>{calls.push({u,i});return provider?provider(u,i):u.endsWith('/models')?json({models:[{slug:'fixture-model',display_name:'Fixture'}]}):json({schema:'trognet-gateway-response/v1',status:'completed',text:'OK',request_sha256:await digest(i.headers['X-TrogNet-Request-Id'])});};
-  let coordinator=new RequestCoordinator({storage},env,{fetcher,...options});
-  const bound={...env,REQUESTS:{idFromName:n=>n,get:()=>({fetch:r=>coordinator.fetch(r)})}};
-  return {storage,calls,bound,restart(){coordinator=new RequestCoordinator({storage},env,{fetcher,...options});},coordinator:()=>coordinator};
+  const bound={...env,PRIVATE_GATEWAY:{fetch:fetcher},REQUESTS:{idFromName:n=>n,get:()=>({fetch:r=>coordinator.fetch(r)})}};
+  let coordinator=new RequestCoordinator({storage},bound,options);
+  return {storage,calls,bound,restart(){coordinator=new RequestCoordinator({storage},bound,options);},coordinator:()=>coordinator};
 }
 function req({route='/e06/responses',method='POST',headers={},body={request_id:rid(1),payload:p()},signal}={}) {
   return new Request(env.APP_ORIGIN+route,{method,headers:{'Cf-Access-Jwt-Assertion':goodJWT,...(method==='POST'?{'Origin':env.APP_ORIGIN,'Content-Type':'application/json','X-TrogNet-CSRF':'1'}:{}),...headers},body:method==='POST'?typeof body==='string'?body:JSON.stringify(body):undefined,signal});
 }
 const run=async(f,options)=>frontDoor(req(options),f.bound);
+test('E06 VPC models receives only fixed URL and reviewed headers with binding receiver',async()=>{
+ const f=fixture();const original=f.bound.PRIVATE_GATEWAY.fetch;
+ f.bound.PRIVATE_GATEWAY.fetch=function(u,i){assert.equal(this,f.bound.PRIVATE_GATEWAY);return original(u,i);};
+ const r=await run(f,{method:'GET',route:'/e06/models',headers:{Cookie:'CF_Authorization=fixture',Host:'evil.example.com','X-Forwarded-Host':'evil.example.com','X-Arbitrary':'private'}});
+ assert.equal(r.status,200);assert.equal(f.calls.length,1);const c=f.calls[0];
+ assert.equal(c.u,'http://private-gateway.invalid/models');assert.equal(c.i.method,'GET');assert.equal(c.i.body,undefined);assert.equal(c.i.redirect,'error');
+ assert.deepEqual(c.i.headers,{'Accept':'application/json','X-TrogNet-Admission':env.ORIGIN_ADMISSION});
+});
+test('E06 VPC absent malformed legacy and throwing bindings never use global or injected fetch',async()=>{
+ const original=globalThis.fetch;let globalCalls=0,injectedCalls=0;
+ globalThis.fetch=()=>{globalCalls++;throw Error('unexpected global fetch');};
+ try {
+  for(const value of [undefined,null,{}, {fetch:1}]) {
+   const f=fixture(undefined,{fetcher:()=>{injectedCalls++;}});f.bound.PRIVATE_GATEWAY=value;
+   for(const kind of ['models','response']) {
+    assert.equal((await run(f,kind==='models'?{method:'GET',route:'/e06/models'}:{})).status,503);
+    assert.equal((await f.coordinator().fetch(new Request('https://internal.invalid/action',{method:'POST',body:JSON.stringify({kind,request_id:rid(1),payload:p()})}))).status,503);
+   }
+   assert.equal(f.calls.length,0);assert.equal(f.storage.map.size,0);
+  }
+  for(const value of ['',undefined,'https://origin.example.com']) {
+   const f=fixture();f.bound.ORIGIN_URL=value;assert.equal((await run(f)).status,503);
+   await assert.rejects(f.coordinator().origin('/models'));assert.equal(f.calls.length,0);
+  }
+  const f=fixture(()=>{throw Error('broken binding');},{fetcher:()=>{injectedCalls++;}});
+  assert.equal((await run(f,{method:'GET',route:'/e06/models'})).status,503);
+  assert.equal((await (await run(f)).json()).status,'uncertain');f.restart();
+  assert.equal((await (await run(f)).json()).status,'uncertain');assert.equal(f.calls.length,2);
+  assert.equal(globalCalls,0);assert.equal(injectedCalls,0);
+ } finally {globalThis.fetch=original;}
+});
+test('E06 VPC rejects target path query and absolute URL injection before dispatch',async()=>{
+ const f=fixture();
+ for(const route of ['/models?url=https://evil.example.com','//evil.example.com/models','https://evil.example.com/responses','/qualify','/models/','/responses/../qualify'])await assert.rejects(f.coordinator().origin(route));
+ for(const route of ['/e06/models?host=evil.example.com','/e06/models/','/e06/%2fmodels','/e06/responses/../qualify'])assert.equal((await run(f,{method:'GET',route})).status,404);
+ assert.equal((await frontDoor(new Request('https://evil.example.com/e06/models',{headers:{'Cf-Access-Jwt-Assertion':goodJWT}}),f.bound)).status,404);
+ assert.equal(f.calls.length,0);
+});
+test('E06 VPC deployment example keeps owner placeholders closed and exact service binding',()=>{
+ const c=JSON.parse(fs.readFileSync(new URL('../wrangler.e06.example.json',import.meta.url),'utf8'));
+ assert.equal(c.name,'trognet-e06-owner-front-door');assert.equal(c.workers_dev,true);assert.equal(c.preview_urls,false);assert.equal(c.vars.ENABLED,'false');
+ assert.equal(c.vars.APP_ORIGIN,'https://trognet-e06-owner-front-door.valateve.workers.dev');assert(!Object.hasOwn(c.vars,'ORIGIN_URL'));assert(!Object.hasOwn(c,'vpc_networks'));
+ assert.deepEqual(c.vpc_services,[{binding:'PRIVATE_GATEWAY',service_id:'01a10c6d-8025-7163-a6b9-c87a58e11918'}]);assert.equal(c.vars.ACCESS_PUBLIC_KEYS,'[]');
+});
 for(const [name,options,status] of [
  ['unauthenticated',{headers:{'Cf-Access-Jwt-Assertion':''}},401],
  ['forged origin admission',{headers:{'X-TrogNet-Admission':'forged'}},403],
@@ -76,7 +120,7 @@ for(const [name,claims,header] of [
 for(const name of ['OPENAI_API_KEY','CREDITS_FALLBACK','TOKEN_ENCRYPTION_KEY','OWNER_ADMISSION','ACCESS_TOKEN','REFRESH_TOKEN'])test('E06 forbids configuration '+name,async()=>{const f=fixture();f.bound[name]='';assert.equal((await run(f)).status,503);assert.equal(f.calls.length,0);});
 test('E06 browser Cookie and JWT stripped; only reviewed origin headers and route',async()=>{
  const f=fixture();const r=await run(f,{headers:{Cookie:'CF_Authorization=fixture','X-Forwarded-Host':'evil.example.com'}});assert.equal(r.status,200);
- const c=f.calls[0];assert.equal(c.u,env.ORIGIN_URL+'/responses');assert.deepEqual(Object.keys(c.i.headers).sort(),['Accept','Content-Type','X-TrogNet-Admission','X-TrogNet-Request-Id'].sort());assert.equal(c.i.redirect,'error');
+ const c=f.calls[0];assert.equal(c.u,'http://private-gateway.invalid/responses');assert.deepEqual(c.i.headers,{'Accept':'application/json','Content-Type':'application/json','X-TrogNet-Admission':env.ORIGIN_ADMISSION,'X-TrogNet-Request-Id':sequenceId(1)});assert.equal(c.i.redirect,'error');assert.equal(c.i.method,'POST');assert.deepEqual(JSON.parse(c.i.body),p());
  const output=await r.text();assert(!output.includes(env.ORIGIN_ADMISSION));assert(!output.includes(goodJWT));assert.equal(JSON.parse(output).inference,'confirmed');
 });
 test('E06 duplicate request and intent across Worker restart never dispatch',async()=>{
