@@ -167,8 +167,8 @@
     },
     {
       "path": "runtime/self-hosted/gateway.mjs",
-      "bytes": 13007,
-      "sha256": "a872d9b8abb72b24d1b831a9b48730067d646beb7186a21e18941fa798897ec9"
+      "bytes": 13008,
+      "sha256": "0b1c537eb3bf9e48d2325728c7d60bdf02abdf4151a1d54c9edb23da585a3ed6"
     },
     {
       "path": "runtime/self-hosted/migrate.mjs",
@@ -372,8 +372,8 @@
     },
     {
       "path": "runtime/tests/e05r5.test.mjs",
-      "bytes": 26342,
-      "sha256": "c641e3d3ff9354d220ff8e948f918fbe0c952f96261c3a6401a03b27e908782c"
+      "bytes": 26770,
+      "sha256": "dcf4333ca1ac0f079057a22d5e72682e43767b0ff939610b366c9c2ad607d49b"
     },
     {
       "path": "runtime/tests/public-readers.test.mjs",

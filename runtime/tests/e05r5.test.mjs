@@ -198,10 +198,17 @@ localTest('ledger remains bounded and never evicts old uncertain identities',asy
   await assert.rejects(f.store.reserveRequest('f'.repeat(64),NOW),/REQUEST_LEDGER_FULL/);
   await assert.rejects(f.store.reserveRequest('0'.repeat(64),NOW),/REQUEST_ALREADY_SEEN/);
 });
+localTest('large valid model catalog is bounded, sanitized and accepted',async t=>{
+  const provider=()=>Response.json({models:[{slug:'fixture-model',display_name:'Fixture model',visibility:'list'}],
+    padding:'x'.repeat(360000)});
+  const f=await serviceFixture(t,{provider});
+  assert.deepEqual(await f.service.models(),{models:[{slug:'fixture-model',display_name:'Fixture model'}]});
+  assert.equal(f.calls.length,1);
+});
 localTest('catalog bearer echo, oversized data and malformed models never escape',async t=>{
   for(const provider of [()=>Response.json({models:[{slug:'fixture-model',display_name:tokens().refresh_token,visibility:'list'}]}),
     ()=>Response.json({models:[{slug:'fixture-model',display_name:'x'.repeat(257),visibility:'list'}]}),
-    ()=>new Response('x'.repeat(262145)),()=>Response.json({models:'invalid'})]){
+    ()=>new Response('x'.repeat(1048577)),()=>Response.json({models:'invalid'})]){
     const f=await serviceFixture(t,{provider});await safeReject(f.service.models());
   }
 });

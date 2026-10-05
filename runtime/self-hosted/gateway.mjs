@@ -74,7 +74,7 @@ export class GatewayService {
   async #catalog(token,secrets,signal) {
     const r=await this.#fetch('https://api.openai.com/v1/models',{method:'GET',redirect:'error',signal,headers:{Authorization:'Bearer '+token,Accept:'application/json'}});
     if(!r.ok) {const e=error('MODEL_CATALOG_UNAVAILABLE',502);e.diagnostic=await providerDiagnostic(r,secrets);throw e;}
-    let b;try {b=JSON.parse(await boundedText(r.body,262144));} catch {throw error('MODEL_CATALOG_UNAVAILABLE',502);}
+    let b;try {b=JSON.parse(await boundedText(r.body,1048576));} catch {throw error('MODEL_CATALOG_UNAVAILABLE',502);}
     if(!plain(b)||!Array.isArray(b.models)||b.models.length>256) throw error('MODEL_CATALOG_UNAVAILABLE',502);
     const models=b.models.filter(m=>plain(m)&&m.visibility==='list').map(m=>{
       if(!text(m.slug,128)||!/^[A-Za-z0-9._-]+$/.test(m.slug)||!text(m.display_name,256)||/[\u0000-\u001f\u007f]/.test(m.display_name)) throw error('MODEL_CATALOG_UNAVAILABLE',502);
