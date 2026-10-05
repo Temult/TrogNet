@@ -1,5 +1,6 @@
 /** Pure owner-bootstrap protocol helpers. No listener, credential file, or network is created here. */
 import {AppError} from './types.js';import {object} from './util.js';import {verifyJwt,type JWK} from './auth.js';import {type TokenSet,validateTokens} from './credential-broker.js';
+import {normalizeRefreshSchedule} from './refresh-schedule.js';
 export const AUTHORIZATION_ENDPOINT='https://auth.openai.com/api/accounts/authorize';
 export const TOKEN_ENDPOINT='https://auth.openai.com/api/accounts/oauth/token';
 export const RESOURCE='https://api.openai.com/v1';
@@ -28,12 +29,13 @@ export function consumeCallback(rawUrl:string,attempt:OAuthAttempt,now=Date.now(
 }
 export async function validateGrant(raw:unknown,attempt:OAuthAttempt,client:string,keys:JWK[],now=Date.now(),expectedSubject?:string):Promise<TokenSet> {
  const response=object(raw);
- if(!attempt.consumed||attempt.resolved_client_id!==client||typeof response.id_token!=='string'||typeof response.scope!=='string'||typeof response.expires_in!=='number'||response.expires_in<180||response.expires_in>86400||String(response.token_type).toLowerCase()!=='bearer')throw new AppError('OAUTH_GRANT_REJECTED');
+ if(!attempt.consumed||attempt.resolved_client_id!==client||typeof response.id_token!=='string'||typeof response.scope!=='string'||response.expires_in!==3600||String(response.token_type).toLowerCase()!=='bearer')throw new AppError('OAUTH_GRANT_REJECTED');
  const identity=await verifyJwt(response.id_token,keys,'https://auth.openai.com',client,Math.floor(now/1000),attempt.nonce);
  if((identity.azp!==undefined&&identity.azp!==client)||(Array.isArray(identity.aud)&&identity.aud.length>1&&identity.azp!==client))throw new AppError('OAUTH_GRANT_REJECTED');
  if(expectedSubject&&identity.sub!==expectedSubject)throw new AppError('OAUTH_IDENTITY_CHANGED');
  const scopes=response.scope.split(/\s+/);if(SCOPES.some(s=>!scopes.includes(s)))throw new AppError('OAUTH_SCOPE_REJECTED');
  const tokens:TokenSet={client_id:client,subject:String(identity.sub),issuer:'https://auth.openai.com',ext_agent_host_id:attempt.host_id,access_token:(response.access_token as string),refresh_token:(response.refresh_token as string),scopes,expires_at_ms:now+response.expires_in*1000,refresh_expires_at_ms:now+30*86400000};
- if(response.earliest_refresh_at!==undefined)tokens.unqualified_refresh_schedule=response.earliest_refresh_at;
+ const schedule=normalizeRefreshSchedule(response,tokens.expires_at_ms);
+ if(schedule!==undefined)tokens.earliest_refresh_at_ms=schedule;
  validateTokens(tokens,attempt.host_id);return tokens;
 }

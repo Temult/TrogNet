@@ -3,7 +3,7 @@
   "self_excluded": true,
   "path_base": "repository root",
   "license": "Apache-2.0",
-  "publication_status": "PUBLIC_RUNTIME_TRANSPORT_FIX",
+  "publication_status": "LOCAL_SELF_HOSTED_GATEWAY_UNPUBLISHED",
   "files": [
     {
       "path": "runtime/LICENSE",
@@ -14,6 +14,21 @@
       "path": "runtime/LICENSE.selection.json",
       "bytes": 155,
       "sha256": "649ac218c8cd30e85fd616b5dafb8b185a1742bd7162d0d16806a99e0226f1f8"
+    },
+    {
+      "path": "runtime/OWNER_BOOTSTRAP_RUNBOOK.md",
+      "bytes": 6933,
+      "sha256": "f88c61739dede3eb66332fe8e0f0a5a9383a109d7083492ecc146ba4057f8e9f"
+    },
+    {
+      "path": "runtime/README.md",
+      "bytes": 3443,
+      "sha256": "ae97a18545c8b40a315c3139d63e850935eea596d55f77785e96d8c54d0752d4"
+    },
+    {
+      "path": "runtime/SECURITY.md",
+      "bytes": 2318,
+      "sha256": "831e6ed8c9445d2f8812a7d46add64b3e649a47d0c0c1ce8b964f2b138c954c6"
     },
     {
       "path": "runtime/migrations/0001_initial.sql",
@@ -34,11 +49,6 @@
       "path": "runtime/owner-oss.example.json",
       "bytes": 816,
       "sha256": "2cf132aa7a118065793411979f9ff3a78741063df95edc79bdb1ef4a7759cd54"
-    },
-    {
-      "path": "runtime/OWNER_BOOTSTRAP_RUNBOOK.md",
-      "bytes": 5357,
-      "sha256": "69dcbf07908c905f25ac9fedd4ed6a268318769f399e589509d39f5ae55de0b0"
     },
     {
       "path": "runtime/package-lock.json",
@@ -64,11 +74,6 @@
       "path": "runtime/public/style.css",
       "bytes": 3448,
       "sha256": "67918a91622f8aaa14fad5cf38cbd4ad847d59ae8dabf5d84a05e3ec79723f16"
-    },
-    {
-      "path": "runtime/README.md",
-      "bytes": 3443,
-      "sha256": "ae97a18545c8b40a315c3139d63e850935eea596d55f77785e96d8c54d0752d4"
     },
     {
       "path": "runtime/schemas/ask.schema.json",
@@ -136,9 +141,59 @@
       "sha256": "b4ceecd88fe219870403b34196ca9dc3a4f9a4ecc22e84b8b5d216506bad8553"
     },
     {
-      "path": "runtime/SECURITY.md",
-      "bytes": 2318,
-      "sha256": "831e6ed8c9445d2f8812a7d46add64b3e649a47d0c0c1ce8b964f2b138c954c6"
+      "path": "runtime/self-hosted/E05R5_INSTALL_PLAN.md",
+      "bytes": 9315,
+      "sha256": "3159be6769dcaf45a47ec63616109088675ad72cc674c5a23be8cd15a2b69a04"
+    },
+    {
+      "path": "runtime/self-hosted/README.md",
+      "bytes": 8028,
+      "sha256": "a56be8c5de6d261f41b917bfe942db7a57b5db5b51b3d01950f806dfaa72fdcc"
+    },
+    {
+      "path": "runtime/self-hosted/deploy/gateway.env.example",
+      "bytes": 524,
+      "sha256": "70fe7bac7a4b4e4fb5cdfff094c2b1589150ff0ca8c5def82e322d0cc6c60e31"
+    },
+    {
+      "path": "runtime/self-hosted/deploy/install-candidate.sh",
+      "bytes": 1720,
+      "sha256": "4e9765f3851475b045778e7b1e4c473bbc3b0fda59b1bb177c3c9673cb0a62c4"
+    },
+    {
+      "path": "runtime/self-hosted/deploy/trognet-gateway.service",
+      "bytes": 1178,
+      "sha256": "eea2ef5ac334613457fd9e653c056a12c2c6d89de38eaeb8a746b2771c8fe8f9"
+    },
+    {
+      "path": "runtime/self-hosted/gateway.mjs",
+      "bytes": 13007,
+      "sha256": "a872d9b8abb72b24d1b831a9b48730067d646beb7186a21e18941fa798897ec9"
+    },
+    {
+      "path": "runtime/self-hosted/migrate.mjs",
+      "bytes": 5527,
+      "sha256": "53cdb8ed752acf4e75a607b4b84c2cac4e85c05f3e525dd20aa133cbe5a62041"
+    },
+    {
+      "path": "runtime/self-hosted/protected-store.mjs",
+      "bytes": 9133,
+      "sha256": "3805b43726d3ed997bfab0f4a975a95e7c0f78c0b21665e30c3911be5d3cab1a"
+    },
+    {
+      "path": "runtime/self-hosted/qualify.mjs",
+      "bytes": 3360,
+      "sha256": "cb7fcf58b803a1c080018c339c0674d3f5ce1d4b5000705a0057e9243872322e"
+    },
+    {
+      "path": "runtime/self-hosted/serve.mjs",
+      "bytes": 2757,
+      "sha256": "fafcae8c2c004c31e029ea2f301395255ecbd51118d0571939b4aec95779bacd"
+    },
+    {
+      "path": "runtime/self-hosted/writer-lock.mjs",
+      "bytes": 182,
+      "sha256": "f18ad39e19e66a9ddcfd5145fe539d42c4ed68c0073deb813c1166ec9e26b390"
     },
     {
       "path": "runtime/src/accepted-knowledge-binding.ts",
@@ -172,8 +227,8 @@
     },
     {
       "path": "runtime/src/credential-broker.ts",
-      "bytes": 10338,
-      "sha256": "168721054eebe6e7d417bcb2125f50cffc6b1e860de9961683886908136f00a1"
+      "bytes": 12668,
+      "sha256": "764bc685b98e1647435e2e75220c1bf27f99f7914975923ecf950d0192c8717f"
     },
     {
       "path": "runtime/src/index.ts",
@@ -192,8 +247,8 @@
     },
     {
       "path": "runtime/src/oauth-protocol.ts",
-      "bytes": 5080,
-      "sha256": "68583693421924863454ba276d8bb5ec0c84474b3aa5da09df0a3f46d5cb5baa"
+      "bytes": 5108,
+      "sha256": "39019531068de1e74586521a524e4bda1dcea5f4ab2b17547e7c8d38a735aae2"
     },
     {
       "path": "runtime/src/oss-oauth.ts",
@@ -271,6 +326,11 @@
       "sha256": "8796661af9173f8191d4e72fa66e9b085baf245c63c791b91f37b1cebc59c3a2"
     },
     {
+      "path": "runtime/src/refresh-schedule.ts",
+      "bytes": 765,
+      "sha256": "3dfc33f55042da5a96ff9fddb580da7df488882c4fd1b6db577fe0e3ae6bdfc2"
+    },
+    {
       "path": "runtime/src/retrieval-terms.ts",
       "bytes": 680,
       "sha256": "ad5b1665531042d38de741346e056b8ed96c96ebd7a007cb1c9694e171b93950"
@@ -302,8 +362,18 @@
     },
     {
       "path": "runtime/tests/e05r2.test.mjs",
-      "bytes": 8943,
-      "sha256": "9ba364855678821dbb9ae9e19b01f9241e1449e5e3f67eb3dae9daf144ca346e"
+      "bytes": 8684,
+      "sha256": "aa6b5c2d326f5e7a767bc1241bb03e86469c65cdbf698b231aba204eb3219734"
+    },
+    {
+      "path": "runtime/tests/e05r4.test.mjs",
+      "bytes": 9553,
+      "sha256": "6009d9136e2dd21ee93f8dfe9834e6daa7292f0d50f6c0ed6658807cf7f6e65f"
+    },
+    {
+      "path": "runtime/tests/e05r5.test.mjs",
+      "bytes": 26342,
+      "sha256": "c641e3d3ff9354d220ff8e948f918fbe0c952f96261c3a6401a03b27e908782c"
     },
     {
       "path": "runtime/tests/public-readers.test.mjs",

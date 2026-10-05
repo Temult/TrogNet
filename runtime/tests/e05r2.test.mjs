@@ -54,11 +54,10 @@ test('E05R2 protected hint binds identity, redacts URLs, and cannot authenticate
  const h=await harness({claims:{sub:'other'}},{identity:activeIdentity,idTokenHint:hint});await assert.rejects(h.run());assert.equal(h.state.active,'prior-active');
 });
 for(const schedule of [1800000000,1800000000000,'1800000000','2027-01-15T08:00:00Z',null,{}])test('E05R2 unsupported renewal encoding stays stopped '+JSON.stringify(schedule),async()=>{
- let tokens;const h=await harness({grant:{earliest_refresh_at:schedule}},{seal:async t=>{tokens=t;return {};}});await h.run();
- assert.deepEqual(tokens.unqualified_refresh_schedule,schedule);let calls=0;
- const core=new BrokerCore(new MemoryStore(),KEY,HOST,async()=>{calls++;throw Error('must not refresh');},()=>NOW+3600000);
- await core.initialize(tokens);await assert.rejects(core.getToken(),/BROKER_REFRESH_SCHEDULE_UNQUALIFIED/);assert.equal(calls,0);
+ let sealed=0;const h=await harness({grant:{earliest_refresh_at:schedule}},{seal:async()=>{sealed++;return {};}});
+ await assert.rejects(h.run(),/REFRESH_SCHEDULE_REJECTED/);assert.equal(sealed,0);
 });
+
 test('E05R2 process termination after pending write preserves disk record and previous active',async()=>{
  const dir=fs.mkdtempSync(path.join(os.tmpdir(),'trognet-enrollment-'));fs.chmodSync(dir,0o700);
  try{

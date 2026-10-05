@@ -1,0 +1,50 @@
+[Unit]
+Description=TrogNet owner plan inference gateway
+Wants=network-online.target
+After=network-online.target
+StartLimitIntervalSec=900
+StartLimitBurst=3
+
+[Service]
+Type=simple
+User=trognet
+Group=trognet
+WorkingDirectory=/opt/trognet/gateway/runtime
+EnvironmentFile=/etc/trognet-gateway/gateway.env
+ExecStart=/usr/bin/node --max-old-space-size=192 self-hosted/serve.mjs
+Restart=on-failure
+RestartSec=60
+TimeoutStopSec=30
+KillMode=control-group
+UMask=0077
+StateDirectory=trognet-gateway
+StateDirectoryMode=0700
+RuntimeDirectory=trognet-gateway
+RuntimeDirectoryMode=0700
+NoNewPrivileges=true
+PrivateTmp=true
+PrivateDevices=true
+ProtectSystem=strict
+ProtectHome=true
+ProtectKernelTunables=true
+ProtectKernelModules=true
+ProtectKernelLogs=true
+ProtectControlGroups=true
+RestrictSUIDSGID=true
+RestrictRealtime=true
+LockPersonality=true
+CapabilityBoundingSet=
+AmbientCapabilities=
+RestrictAddressFamilies=AF_UNIX AF_INET AF_INET6
+ReadWritePaths=/var/lib/trognet-gateway /run/trognet-gateway
+LimitNOFILE=128
+TasksMax=32
+MemoryHigh=256M
+MemoryMax=384M
+MemorySwapMax=0
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=trognet-gateway
+
+[Install]
+WantedBy=multi-user.target

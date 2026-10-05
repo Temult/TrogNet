@@ -1,9 +1,10 @@
 import {AppError,type Fetcher} from './types.js';
 import {boundedText,object,utf8} from './util.js';
+import {normalizeRefreshSchedule} from './refresh-schedule.js';
 export interface TokenSet {client_id:string;subject:string;issuer:string;ext_agent_host_id:string;workspace_id?:string;id_token?:string;access_token:string;refresh_token:string;scopes:string[];expires_at_ms:number;refresh_expires_at_ms:number;earliest_refresh_at_ms?:number;unqualified_refresh_schedule?:unknown;}
 export interface ProtectedStore {get<T>(key:string):Promise<T|undefined>;put(key:string,value:unknown):Promise<void>;}
 interface Envelope {schema:'librarian-token-envelope/v1';iv:string;ciphertext:string;}
-interface RecordState {phase:'ready'|'refreshing'|'replacement_staged'|'reauth_required'|'disabled';generation:number;sealed:Envelope;qualification?:{identity:string;epoch:number;digest:string};}
+interface RecordState {phase:'ready'|'refreshing'|'replacement_staged'|'reauth_required'|'disabled'|'configuration_error';generation:number;sealed?:Envelope;retry_not_before_ms?:number;qualification?:{identity:string;epoch:number;digest:string};}
 function b64(b:Uint8Array):string{return btoa(String.fromCharCode(...b));}function unb64(s:string):Uint8Array{return Uint8Array.from(atob(s),c=>c.charCodeAt(0));}
 async function keyFrom(secret:string):Promise<CryptoKey>{let raw:Uint8Array;try{raw=unb64(secret);}catch{throw new AppError('BROKER_CONFIG',503);}if(raw.byteLength!==32)throw new AppError('BROKER_CONFIG',503);return crypto.subtle.importKey('raw',raw,'AES-GCM',false,['encrypt','decrypt']);}
 export async function sealToken(tokens:TokenSet,key:string,host:string):Promise<Envelope>{const iv=crypto.getRandomValues(new Uint8Array(12));const ciphertext=await crypto.subtle.encrypt({name:'AES-GCM',iv,additionalData:utf8.encode('librarian-v1|'+host)},await keyFrom(key),utf8.encode(JSON.stringify(tokens)));return {schema:'librarian-token-envelope/v1',iv:b64(iv),ciphertext:b64(new Uint8Array(ciphertext))};}
@@ -21,7 +22,7 @@ export class BrokerCore {
   const old=await this.store.get<RecordState>('session');
   if(old?.qualification?.identity!==undefined&&old.qualification.identity!==identity)throw new AppError('BROKER_IDENTITY_CHANGED',409);
   if(old?.qualification?.epoch===epoch){if(old.qualification.digest!==digest)throw new AppError('IMPORT_CONFLICT',409);return 'ALREADY_IMPORTED';}
-  if(!Number.isSafeInteger(epoch)||epoch!==(old?((old.qualification?.epoch??-2)+1):0)||old&&!['reauth_required','refreshing','disabled'].includes(old.phase))throw new AppError('IMPORT_CONFLICT',409);
+  if(!Number.isSafeInteger(epoch)||epoch!==(old?((old.qualification?.epoch??-2)+1):0)||old&&!['reauth_required','refreshing','disabled','configuration_error'].includes(old.phase))throw new AppError('IMPORT_CONFLICT',409);
   if(tokens.expires_at_ms<=this.now()+120000||tokens.refresh_expires_at_ms<=this.now())throw new AppError('BROKER_REAUTH',503);
   // Session and consumed import identity are a single durable write, including on reauthorization.
   await this.store.put('session',{phase:'ready',generation:(old?.generation??-1)+1,sealed:await sealToken(tokens,this.key,this.host),qualification:{identity,epoch,digest}} satisfies RecordState);
@@ -36,20 +37,63 @@ export class BrokerCore {
  async getToken():Promise<string>{return this.exclusive(async()=>{
    let record=await this.store.get<RecordState>('session');if(!record)throw new AppError('BROKER_REAUTH',503);
    if(record.phase==='replacement_staged'){await this.store.put('session',{...record,phase:'ready'});record={...record,phase:'ready'};}
-   if(record.phase!=='ready')throw new AppError('BROKER_REAUTH',503);
-   const tokens=await openToken(record.sealed,this.key,this.host),now=this.now();if(this.requiredScopes.some(s=>!tokens.scopes.includes(s)))throw new AppError('BROKER_REAUTH',503);if(tokens.expires_at_ms>now+120000)return tokens.access_token;
+   if(record.phase==='configuration_error')throw new AppError('BROKER_CONFIG',503);
+   if(record.phase==='refreshing')throw new AppError('BROKER_REFRESH_RECONCILIATION_REQUIRED',503);
+   if(record.phase!=='ready'||!record.sealed)throw new AppError('BROKER_REAUTH',503);
+   const tokens=await openToken(record.sealed,this.key,this.host),now=this.now();
+   if(this.requiredScopes.some(s=>!tokens.scopes.includes(s)))throw new AppError('BROKER_REAUTH',503);
+   if(tokens.expires_at_ms>now+120000)return tokens.access_token;
    if(tokens.unqualified_refresh_schedule!==undefined)throw new AppError('BROKER_REFRESH_SCHEDULE_UNQUALIFIED',503);
    if(tokens.earliest_refresh_at_ms!==undefined&&tokens.earliest_refresh_at_ms>now)throw new AppError('BROKER_REFRESH_DEFERRED',503);
-   if(tokens.refresh_expires_at_ms<=now){await this.store.put('session',{...record,phase:'reauth_required'});throw new AppError('BROKER_REAUTH',503);}
-   await this.store.put('session',{...record,phase:'refreshing'});let staged=false;
+   if(tokens.refresh_expires_at_ms<=now){const {sealed,...metadata}=record;await this.store.put('session',{...metadata,phase:'reauth_required'});throw new AppError('BROKER_REAUTH',503);}
+   if((record.retry_not_before_ms??0)>now)throw new AppError('BROKER_REFRESH_BACKOFF',503);
+   // Durable before dispatch: restart cannot replay a possibly consumed token.
+   await this.store.put('session',{...record,phase:'refreshing'});
+   const retry=async():Promise<never>=>{
+     await this.store.put('session',{...record,phase:'ready',retry_not_before_ms:this.now()+30000});
+     throw new AppError('BROKER_REFRESH_BACKOFF',503);
+   };
+   let r:Response;
    try{
-     const r=await this.fetcher('https://auth.openai.com/api/accounts/oauth/token',{method:'POST',redirect:'error',signal:AbortSignal.timeout(15000),headers:{'Content-Type':'application/x-www-form-urlencoded'},body:new URLSearchParams({grant_type:'refresh_token',client_id:tokens.client_id,refresh_token:(tokens.refresh_token),resource:'https://api.openai.com/v1'})});
-     if(!r.ok){await r.body?.cancel().catch(()=>{});throw new Error('refresh');}
-     const body=object(JSON.parse(await boundedText(r.body,49152)));if(typeof body.access_token!=='string'||typeof body.refresh_token!=='string'||body.refresh_token===(tokens.refresh_token)||typeof body.expires_in!=='number'||body.expires_in<180||body.expires_in>86400||String(body.token_type).toLowerCase()!=='bearer')throw new Error('token');
-     const scopes=body.scope===undefined?tokens.scopes:typeof body.scope==='string'?body.scope.split(/\s+/):[];const replacement:TokenSet={...tokens,access_token:(body.access_token),refresh_token:(body.refresh_token),scopes,expires_at_ms:now+body.expires_in*1000,refresh_expires_at_ms:now+30*86400000};delete replacement.earliest_refresh_at_ms;delete replacement.unqualified_refresh_schedule;if(body.earliest_refresh_at!==undefined)replacement.unqualified_refresh_schedule=body.earliest_refresh_at;validateTokens(replacement,this.host);
+     r=await this.fetcher('https://auth.openai.com/api/accounts/oauth/token',{method:'POST',redirect:'error',signal:AbortSignal.timeout(15000),headers:{'Content-Type':'application/x-www-form-urlencoded'},body:new URLSearchParams({grant_type:'refresh_token',client_id:tokens.client_id,refresh_token:(tokens.refresh_token),resource:'https://api.openai.com/v1'})});
+   }catch(error){
+     // Only DNS/connect refusal proves no HTTP request reached the provider.
+     // Timeouts, resets and generic network failures have ambiguous outcomes.
+     const cause=error instanceof TypeError?error.cause:undefined;
+     if(cause&&typeof cause==='object'&&'code'in cause&&['ENOTFOUND','EAI_AGAIN','ECONNREFUSED'].includes(String(cause.code)))return retry();
+     throw new AppError('BROKER_REFRESH_RECONCILIATION_REQUIRED',503);
+   }
+   if(!r.ok){
+     let code:unknown;
+     try{const body=object(JSON.parse(await boundedText(r.body,49152)));code=typeof body.error==='string'?body.error:object(body.error).code;}catch{/* Unstructured errors cannot prove non-consumption. */}
+     if(['invalid_grant','invalid_refresh_token','token_expired','refresh_token_expired','refresh_token_invalidated','refresh_token_reused'].includes(String(code))){
+       const {sealed,...metadata}=record;await this.store.put('session',{...metadata,phase:'reauth_required'});throw new AppError('BROKER_REAUTH',503);
+     }
+     if(code==='invalid_client'){await this.store.put('session',{...record,phase:'configuration_error'});throw new AppError('BROKER_CONFIG',503);}
+     // Even a temporary HTTP failure does not document safe replay of a rotating
+     // grant. Preserve sealed credentials in refreshing for owner reconciliation.
+     throw new AppError('BROKER_REFRESH_RECONCILIATION_REQUIRED',503);
+   }
+   try{
+     const body=object(JSON.parse(await boundedText(r.body,49152)));
+     if(typeof body.access_token!=='string'||!body.access_token.trim()||typeof body.refresh_token!=='string'||!body.refresh_token.trim()||body.refresh_token===(tokens.refresh_token)||body.expires_in!==3600||String(body.token_type).toLowerCase()!=='bearer')throw new Error('token');
+     const scopes=body.scope===undefined?tokens.scopes:typeof body.scope==='string'?body.scope.split(/\s+/):[];
+     const replacement:TokenSet={...tokens,access_token:(body.access_token),refresh_token:(body.refresh_token),scopes,expires_at_ms:now+body.expires_in*1000,refresh_expires_at_ms:now+30*86400000};
+     delete replacement.earliest_refresh_at_ms;delete replacement.unqualified_refresh_schedule;
+     const schedule=normalizeRefreshSchedule(body,replacement.expires_at_ms);
+     if(schedule!==undefined)replacement.earliest_refresh_at_ms=schedule;
+     validateTokens(replacement,this.host);
      if(this.requiredScopes.some(s=>!replacement.scopes.includes(s)))throw new Error('scope');
-     const stagedRecord:RecordState={...record,phase:'replacement_staged',generation:record.generation+1,sealed:await sealToken(replacement,this.key,this.host)};await this.store.put('session',stagedRecord);staged=true;await this.store.put('session',{...stagedRecord,phase:'ready'});return replacement.access_token;
-   }catch{if(!staged)await this.store.put('session',{...record,phase:'reauth_required'}).catch(()=>{});throw new AppError('BROKER_REAUTH',503);}
+     const {retry_not_before_ms,...metadata}=record;
+     const stagedRecord:RecordState={...metadata,phase:'replacement_staged',generation:record.generation+1,sealed:await sealToken(replacement,this.key,this.host)};
+     await this.store.put('session',stagedRecord);
+     await this.store.put('session',{...stagedRecord,phase:'ready'});
+     return replacement.access_token;
+   }catch{
+     // Never overwrite a replacement: put may have committed before rejecting.
+     // The durable state is either refreshing (frozen) or the latest replacement.
+     throw new AppError('BROKER_REFRESH_RECONCILIATION_REQUIRED',503);
+   }
  });}
 }
 interface BrokerEnv {TOKEN_ENCRYPTION_KEY:string;BROKER_HOST_ID:string;BROKER_BOOTSTRAP_SECRET?:string;PLAN_REMOTE_ELIGIBILITY_REF?:string;PLAN_VISIBILITY_DECISION_REF?:string;}
