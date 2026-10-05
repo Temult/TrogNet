@@ -1,0 +1,41 @@
+[Unit]
+Description=TrogNet narrow gateway tunnel
+After=network-online.target trognet-gateway.service
+Wants=network-online.target
+StartLimitIntervalSec=900
+StartLimitBurst=3
+
+[Service]
+User=trognet-tunnel
+Group=trognet-tunnel
+ExecStart=/usr/local/bin/cloudflared --config /etc/cloudflared-trognet/config.yml --no-autoupdate tunnel run
+Restart=on-failure
+RestartSec=60
+TimeoutStopSec=30
+NoNewPrivileges=true
+PrivateTmp=true
+PrivateDevices=true
+ProtectSystem=strict
+ProtectHome=true
+ProtectKernelTunables=true
+ProtectKernelModules=true
+ProtectKernelLogs=true
+ProtectControlGroups=true
+RestrictSUIDSGID=true
+RestrictRealtime=true
+LockPersonality=true
+CapabilityBoundingSet=
+AmbientCapabilities=
+RestrictAddressFamilies=AF_UNIX AF_INET AF_INET6
+InaccessiblePaths=-/run/trognet-gateway -/etc/trognet-gateway/secrets -/var/lib/trognet-gateway
+UMask=0077
+TasksMax=64
+LimitNOFILE=256
+MemoryHigh=96M
+MemoryMax=160M
+MemorySwapMax=0
+StandardOutput=null
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target

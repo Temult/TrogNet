@@ -1,0 +1,17 @@
+# Owner-only E06 Tunnel template. Replace placeholders locally. No owner socket.
+tunnel: REPLACE_ME_TUNNEL_UUID
+credentials-file: /etc/cloudflared-trognet/tunnel.json
+metrics: 127.0.0.1:19457
+loglevel: error
+ingress:
+  - hostname: REPLACE_ME_ORIGIN_HOSTNAME
+    path: ^/health$
+    service: http://127.0.0.1:19456
+  - hostname: REPLACE_ME_ORIGIN_HOSTNAME
+    path: ^/(models|responses)$
+    service: http://127.0.0.1:19456
+    originRequest:
+      connectTimeout: 5s
+      keepAliveConnections: 1
+      keepAliveTimeout: 1s
+  - service: http_status:404

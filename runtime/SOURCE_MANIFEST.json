@@ -3,7 +3,7 @@
   "self_excluded": true,
   "path_base": "repository root",
   "license": "Apache-2.0",
-  "publication_status": "LOCAL_SELF_HOSTED_GATEWAY_UNPUBLISHED",
+  "publication_status": "LOCAL_E06_UNPUBLISHED",
   "files": [
     {
       "path": "runtime/LICENSE",
@@ -29,6 +29,101 @@
       "path": "runtime/SECURITY.md",
       "bytes": 2318,
       "sha256": "831e6ed8c9445d2f8812a7d46add64b3e649a47d0c0c1ce8b964f2b138c954c6"
+    },
+    {
+      "path": "runtime/e06/CURRENT_BASELINE.md",
+      "bytes": 2091,
+      "sha256": "a629bda6a1197047fd1fb2b93cde3e63ffbac71dec95a934ca46d720394c7a70"
+    },
+    {
+      "path": "runtime/e06/E06_ARCHITECTURE_DECISION.md",
+      "bytes": 2186,
+      "sha256": "f31ca185fce916d9ec5cf29670aa00476981a22f65210bc44325c642fadbb287"
+    },
+    {
+      "path": "runtime/e06/E06_E_CHECKPOINT.md",
+      "bytes": 2484,
+      "sha256": "69198802a59fdb0d063d5c1872bb243e48529d554ea9496effa276bd281118dc"
+    },
+    {
+      "path": "runtime/e06/EXECUTIVE_SUMMARY.md",
+      "bytes": 1954,
+      "sha256": "ac77e9435c01d0de65383e9450aec4f9eeb1e905c124eb6802a7757947112943"
+    },
+    {
+      "path": "runtime/e06/IMPLEMENTATION_NOTES.md",
+      "bytes": 3110,
+      "sha256": "0d1534fd42e9da3818de0aeb57ddcbfdd48222b3ca84c41d1ae7a51c23d7e386"
+    },
+    {
+      "path": "runtime/e06/OPEN_BOUNDARIES_AND_NEXT_STEPS.md",
+      "bytes": 2340,
+      "sha256": "973cd75a5ae91e9f111b45147a4fb8409baec93692bcff12bb321d0185746645"
+    },
+    {
+      "path": "runtime/e06/OWNER_EXECUTION_ORDER.md",
+      "bytes": 2429,
+      "sha256": "e65b0910411f022fdeefe5a1cb912054e7e02b511bc63589e29e4886026b0636"
+    },
+    {
+      "path": "runtime/e06/READ_ME_FIRST.md",
+      "bytes": 1743,
+      "sha256": "878d83728ff8623abb4be4bf89c00789ede8a034ddad63da0a04e73e1a16288e"
+    },
+    {
+      "path": "runtime/e06/REQUEST_IDENTITY_AND_RECONCILIATION.md",
+      "bytes": 2982,
+      "sha256": "43dad1c90e335e3180ebc9519e3fe8fe139ac116c25f6d6094e99734e32eef1e"
+    },
+    {
+      "path": "runtime/e06/TEST_RESULTS.md",
+      "bytes": 3010,
+      "sha256": "19a6332c64f07deb30a52f5bf1126aabcd8b938f467857f0ab6ab0c06d6da289"
+    },
+    {
+      "path": "runtime/e06/THREAT_MODEL.md",
+      "bytes": 9983,
+      "sha256": "06f66d16b0b4e796389035a0a7844c76d7db89f80830c1bcd59c43ef2766c9af"
+    },
+    {
+      "path": "runtime/e06/archive-ledger.mjs",
+      "bytes": 2250,
+      "sha256": "eccb629f611d5b51bc9c3867a1cb9c1843bf38a9ca22a1b4f2b83d5e2d8429b3"
+    },
+    {
+      "path": "runtime/e06/front-door.mjs",
+      "bytes": 12507,
+      "sha256": "f746feefbbc2deaaab9bd407ba88471e9f13ec158333dc37fd552dc5f2e8785b"
+    },
+    {
+      "path": "runtime/e06/owner/OWNER_KIT.md",
+      "bytes": 12243,
+      "sha256": "3fba919abfcdaaa872645d85b6f012c062aa36122e851358980616c5b6420810"
+    },
+    {
+      "path": "runtime/e06/owner/cloudflared.example.yml",
+      "bytes": 553,
+      "sha256": "bc778984a6a7c8056569f91c8ae2fd98765aa7642c7d43fbfbc695b42fe68d5a"
+    },
+    {
+      "path": "runtime/e06/owner/fence-status.mjs",
+      "bytes": 1345,
+      "sha256": "2fd0dcfffdd814043df6ffbe953653a455aecf36c7682aadf0a649b5958e2848"
+    },
+    {
+      "path": "runtime/e06/owner/install-tunnel.sh",
+      "bytes": 2286,
+      "sha256": "62c34d5e991884e536b16caebef715f3e50b4ebe8f4b1e0a62763f17b669e234"
+    },
+    {
+      "path": "runtime/e06/owner/qualification.mjs",
+      "bytes": 7577,
+      "sha256": "15f1be436e17d3e51600216a4667f133301b687a2146f292f4441fadaa0414fb"
+    },
+    {
+      "path": "runtime/e06/owner/trognet-tunnel.service",
+      "bytes": 1001,
+      "sha256": "866637ff852adfe51161858e93531480fa8a10615f4d0f8f955287818fcded6e"
     },
     {
       "path": "runtime/migrations/0001_initial.sql",
@@ -167,8 +262,8 @@
     },
     {
       "path": "runtime/self-hosted/gateway.mjs",
-      "bytes": 13008,
-      "sha256": "0b1c537eb3bf9e48d2325728c7d60bdf02abdf4151a1d54c9edb23da585a3ed6"
+      "bytes": 13209,
+      "sha256": "ef6fc22f44e4853b734bbd511ab6464284e440bc976e40fa3687d2df9987e217"
     },
     {
       "path": "runtime/self-hosted/migrate.mjs",
@@ -177,8 +272,8 @@
     },
     {
       "path": "runtime/self-hosted/protected-store.mjs",
-      "bytes": 9133,
-      "sha256": "3805b43726d3ed997bfab0f4a975a95e7c0f78c0b21665e30c3911be5d3cab1a"
+      "bytes": 11362,
+      "sha256": "c2b72c6a383b3a759f22123edea6b799f04319d1d9cdc903266677ca2de7e2bd"
     },
     {
       "path": "runtime/self-hosted/qualify.mjs",
@@ -367,13 +462,18 @@
     },
     {
       "path": "runtime/tests/e05r4.test.mjs",
-      "bytes": 9553,
-      "sha256": "6009d9136e2dd21ee93f8dfe9834e6daa7292f0d50f6c0ed6658807cf7f6e65f"
+      "bytes": 9552,
+      "sha256": "b3c0920a251f80cf01253d93e2b1b6b1cd73f03b263c592c84dbf1d0e0f6d9ea"
     },
     {
       "path": "runtime/tests/e05r5.test.mjs",
       "bytes": 26770,
       "sha256": "dcf4333ca1ac0f079057a22d5e72682e43767b0ff939610b366c9c2ad607d49b"
+    },
+    {
+      "path": "runtime/tests/e06.test.mjs",
+      "bytes": 25963,
+      "sha256": "d69f378caae3e77369d866247c9cb1851a462dc9e95efe62a26f46fb7bab19c2"
     },
     {
       "path": "runtime/tests/public-readers.test.mjs",
@@ -401,6 +501,11 @@
       "sha256": "11fbcd6f7c2406e86903baba3d51807d19e86fa00e5dcb8c56d6cc14b2852547"
     },
     {
+      "path": "runtime/wrangler.e06.example.json",
+      "bytes": 692,
+      "sha256": "087dbb4a776d73a705302b8d71286c25344def309f2d74486dfe63d8e3a3c199"
+    },
+    {
       "path": "runtime/wrangler.owner-plan-staging.example.json",
       "bytes": 1966,
       "sha256": "3a9a1ccda29f556d4f71b1c3e33440d504370b13a6dd99aff3ec1bb493e6a76e"
@@ -410,5 +515,7 @@
       "bytes": 863,
       "sha256": "4c225fe45ccdfebcdb6af0c73fdbd47af18b58206a165f1d40a509916be030e8"
     }
-  ]
+  ],
+  "parent_commit": "07569eef742c242994b950c6e982d86d4f6dfc04",
+  "reconciled_owner_evidence": "Gate 5I PASS supplied after worker completion; docs-only reconciliation v1.1"
 }

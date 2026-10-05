@@ -1,0 +1,19 @@
+{
+  "name": "trognet-e06-owner-front-door",
+  "main": "e06/front-door.mjs",
+  "compatibility_date": "2026-10-05",
+  "workers_dev": false,
+  "preview_urls": false,
+  "observability": {"enabled": false},
+  "durable_objects": {"bindings": [{"name": "REQUESTS", "class_name": "RequestCoordinator"}]},
+  "migrations": [{"tag": "e06-v1", "new_sqlite_classes": ["RequestCoordinator"]}],
+  "vars": {
+    "ENABLED": "false",
+    "APP_ORIGIN": "https://REPLACE_ME.invalid",
+    "ORIGIN_URL": "https://REPLACE_ME_ORIGIN.invalid",
+    "ACCESS_ISSUER": "https://REPLACE_ME.cloudflareaccess.com",
+    "ACCESS_AUDIENCE": "REPLACE_ME",
+    "OWNER_SUBJECT": "REPLACE_ME",
+    "ACCESS_PUBLIC_KEYS": "[]"
+  }
+}

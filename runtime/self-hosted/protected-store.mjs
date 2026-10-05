@@ -2,6 +2,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import {spawn} from 'node:child_process';
 import {fileURLToPath} from 'node:url';
+import {createHash} from 'node:crypto';
 
 export const STATE_LIMIT = 262144;
 const fail = () => { throw Error('PROTECTED_STORE_REJECTED'); };
@@ -56,7 +57,13 @@ export function validRecord(r) {
     e.ciphertext.length >= 24 && e.ciphertext.length <= 131072 && /^(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?$/.test(e.ciphertext);
 }
 function validState(s) {
-  if(!keys(s,['schema','session','migration','requests']) || s.schema !== 'trognet-file-broker/v1' || (s.session !== undefined && !validRecord(s.session))) return false;
+  if(!keys(s,['schema','session','migration','requests','requestFence']) || s.schema !== 'trognet-file-broker/v1' || (s.session !== undefined && !validRecord(s.session))) return false;
+  if(s.requestFence !== undefined) {
+    const f=s.requestFence;
+    if(!keys(f,['high_water','legacy_closed','archive_sha256','legacy_count','legacy_hashes']) || !uint(f.high_water) || f.legacy_closed!==true ||
+       !digest(f.archive_sha256) || !uint(f.legacy_count) || f.legacy_count>512 || s.requests?.length!==0 ||
+       !Array.isArray(f.legacy_hashes) || f.legacy_hashes.length!==f.legacy_count || !f.legacy_hashes.every(digest) || new Set(f.legacy_hashes).size!==f.legacy_count) return false;
+  }
   if(s.migration !== undefined) {
     const m=s.migration;
     if(!keys(m,['source_sha256','host_sha256','tokens_sha256','access_expires_at_ms','earliest_refresh_at_ms']) ||
@@ -137,12 +144,45 @@ export class FileProtectedStore {
   async reserveRequest(id,now) {
     try {
       const s=this.#read();
+      if(s.requestFence) throw Error('REQUEST_ALREADY_SEEN');
       // Durable tombstones have no automatic expiry: E06 must reconcile and
       // archive them offline. A full bounded ledger fails closed, never evicts.
       if(s.requests.some(r=>r.id===id)) throw Error('REQUEST_ALREADY_SEEN');
       if(s.requests.length>=512) throw Error('REQUEST_LEDGER_FULL');
       s.requests.push({id,at_ms:now}); this.#write(s);
     } catch(e) { if(['REQUEST_ALREADY_SEEN','REQUEST_LEDGER_FULL'].includes(e.message)) throw e; fail(); }
+  }
+  async requestArchive() {
+    const s=this.#read();
+    if(s.requestFence) throw Error('REQUEST_FENCE_ALREADY_ENABLED');
+    return {schema:'trognet-request-archive/v1',requests:structuredClone(s.requests)};
+  }
+  async enableRequestFence(archiveSha256) {
+    const s=this.#read();
+    if(s.requestFence) {
+      if(s.requestFence.archive_sha256!==archiveSha256) fail();
+      return structuredClone(s.requestFence);
+    }
+    const archive=JSON.stringify(await this.requestArchive());
+    if(createHash('sha256').update(archive).digest('hex')!==archiveSha256) fail();
+    s.requestFence={high_water:0,legacy_closed:true,archive_sha256:archiveSha256,legacy_count:s.requests.length,legacy_hashes:s.requests.map(r=>r.id)};
+    s.requests=[];
+    this.#write(s);
+    return structuredClone(s.requestFence);
+  }
+  async reserveGatewayRequest(requestId,now) {
+    const s=this.#read();
+    if(!s.requestFence) {
+      if(requestId.startsWith('e06_')) throw Error('REQUEST_FENCE_REQUIRED');
+      return this.reserveRequest(createHash('sha256').update(requestId).digest('hex'),now);
+    }
+    if(!/^e06_[0-9]{16}$/.test(requestId)) throw Error('REQUEST_ALREADY_SEEN');
+    if(s.requestFence.legacy_hashes.includes(createHash('sha256').update(requestId).digest('hex'))) throw Error('REQUEST_ALREADY_SEEN');
+    const sequence=Number(requestId.slice(4));
+    if(!Number.isSafeInteger(sequence) || sequence<=s.requestFence.high_water) throw Error('REQUEST_ALREADY_SEEN');
+    // A durable prefix tombstone: all lower sequences stay consumed forever.
+    s.requestFence.high_water=sequence;
+    this.#write(s);
   }
   async close() {
     if(this.#closed) return; this.#closed=true;

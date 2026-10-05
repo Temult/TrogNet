@@ -89,7 +89,7 @@ export class GatewayService {
     return this.#exclusive(async()=>{
       const p=validateRequest(payload);
       if(typeof requestId!=='string'||!/^[A-Za-z0-9_-]{16,96}$/.test(requestId)) throw error('REQUEST_ID_REQUIRED',400);
-      try {await this.#store.reserveRequest(hash(requestId),this.#now());} catch(e) {
+      try {await this.#store.reserveGatewayRequest(requestId,this.#now());} catch(e) {
         throw error(e.message==='REQUEST_ALREADY_SEEN'?'REQUEST_ALREADY_SEEN':'REQUEST_LEDGER_UNAVAILABLE',409);
       }
       let dispatched=false;
@@ -97,6 +97,8 @@ export class GatewayService {
         const t=await this.#token();
         return await deadline(async signal=>{
           const models=await this.#catalog(t.token,t.secrets,signal);
+          // A late catalog completion after the deadline cannot start inference.
+          signal.throwIfAborted();
           if(!models.some(m=>m.slug===p.model)) throw error('MODEL_NOT_VISIBLE',400);
           dispatched=true;
           const r=await this.#fetch('https://api.openai.com/v1/responses',{method:'POST',redirect:'error',signal,
@@ -106,7 +108,8 @@ export class GatewayService {
           if(!r.body || (contentType && !/^text\/event-stream(?:;|$)/i.test(contentType))) {await r.body?.cancel();throw error('PROVIDER_UNCERTAIN',502);}
           const result=await consumeResponse(r.body);
           // No raw events, IDs, reasoning, headers, or unbounded usage objects.
-          return noSecrets({schema:'trognet-gateway-response/v1',status:'completed',text:result.text},t.secrets);
+          return noSecrets({schema:'trognet-gateway-response/v1',status:'completed',text:result.text,
+            ...(requestId.startsWith('e06_')?{request_sha256:hash(requestId)}:{})},t.secrets);
         },this.#timeout);
       } catch(e) {
         if(dispatched) {const failure=error('PROVIDER_UNCERTAIN',502);if(e.diagnostic)failure.diagnostic=e.diagnostic;throw failure;}
