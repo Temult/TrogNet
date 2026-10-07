@@ -112,6 +112,18 @@ for(const [name,options,status] of [
  ['oversized instructions',{body:{request_id:rid(1),payload:{...p(),instructions:'x'.repeat(16001)}}},400],
  ['bad encoding',{headers:{'Content-Encoding':'gzip'}},403],
 ])test('E06 browser rejects '+name,async()=>{const f=fixture();const r=await run(f,options);assert.equal(r.status,status);assert.equal(f.calls.length,0);assert(!r.headers.has('access-control-allow-origin'));});
+test('E06 authenticated Access callback may navigate to qualification page but cannot trigger origin work',async()=>{
+ const callback={'Sec-Fetch-Site':'cross-site','Sec-Fetch-Mode':'navigate','Sec-Fetch-Dest':'document'};
+ const f=fixture();const page=await run(f,{method:'GET',route:'/e06/qualification',headers:callback});
+ assert.equal(page.status,200);assert.equal(f.calls.length,0);assert((await page.text()).includes('TrogNet owner qualification'));
+ assert.equal((await run(f,{method:'GET',route:'/e06/models',headers:callback})).status,403);assert.equal(f.calls.length,0);
+ for(const headers of [
+  {'Sec-Fetch-Site':'cross-site'},
+  {'Sec-Fetch-Site':'cross-site','Sec-Fetch-Mode':'cors','Sec-Fetch-Dest':'empty'},
+  {'Sec-Fetch-Site':'same-site','Sec-Fetch-Mode':'navigate','Sec-Fetch-Dest':'document'},
+  {...callback,Origin:'https://evil.example.com'},
+ ]){assert.equal((await run(f,{method:'GET',route:'/e06/qualification',headers})).status,403);assert.equal(f.calls.length,0);}
+});
 for(const [name,claims,header] of [
  ['unauthorized owner',{sub:'different-owner'},{}],['service identity',{type:'service'},{}],['expired',{exp:1},{}],
  ['issuer',{iss:'https://evil.example.com'},{}],['audience',{aud:['other']},{}],['future nbf',{nbf:9999999999},{}],

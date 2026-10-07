@@ -62,7 +62,10 @@ export async function frontDoor(request,env) {
     const status=/^\/e06\/requests\/([A-Za-z0-9_-]{16,96})$/.exec(u.pathname);
     if(!((request.method==='GET'&&(['/e06/models','/e06/qualification'].includes(u.pathname)||status))||(request.method==='POST'&&u.pathname==='/e06/responses')))fail('NOT_FOUND',404);
     const origin=request.headers.get('Origin');
-    if((origin!==null&&origin!==env.APP_ORIGIN)||['cross-site','same-site'].includes(request.headers.get('Sec-Fetch-Site')))fail('ORIGIN_REJECTED',403);
+    const fetchSite=request.headers.get('Sec-Fetch-Site');
+    const qualificationCallback=request.method==='GET'&&u.pathname==='/e06/qualification'&&origin===null&&fetchSite==='cross-site'&&
+      request.headers.get('Sec-Fetch-Mode')==='navigate'&&request.headers.get('Sec-Fetch-Dest')==='document';
+    if((origin!==null&&origin!==env.APP_ORIGIN)||fetchSite==='same-site'||(fetchSite==='cross-site'&&!qualificationCallback))fail('ORIGIN_REJECTED',403);
     if(request.method==='POST'&&(origin!==env.APP_ORIGIN||request.headers.get('X-TrogNet-CSRF')!=='1'||request.headers.get('Content-Type')!=='application/json'))fail('ORIGIN_REJECTED',403);
     const token=request.headers.get('Cf-Access-Jwt-Assertion');if(!token)fail('AUTH_REQUIRED',401);
     let claims;
