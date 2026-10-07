@@ -138,7 +138,7 @@ export class RequestCoordinator {
       const h={'Accept':'application/json','X-TrogNet-Admission':this.env.ORIGIN_ADMISSION};
       if(body){h['Content-Type']='application/json';h['X-TrogNet-Request-Id']=gatewayId;}
       // Synthetic HTTP URL/Host only; the registered VPC Service fixes the target.
-      const r=await this.env.PRIVATE_GATEWAY.fetch('http://private-gateway.invalid'+path,{method:body?'POST':'GET',headers:h,body:body?JSON.stringify(body):undefined,redirect:'error',signal});
+      const r=await this.env.PRIVATE_GATEWAY.fetch('http://private-gateway.invalid'+path,{method:body?'POST':'GET',headers:h,body:body?JSON.stringify(body):undefined,redirect:'manual',signal});
       if(r.headers.get('content-type')?.split(';')[0].trim()!=='application/json')throw Error('UPSTREAM_REJECTED');
       const b=await boundedJSON(r,262144,signal);
       const raw=JSON.stringify(b);

@@ -47,7 +47,7 @@ test('E06 VPC models receives only fixed URL and reviewed headers with binding r
  f.bound.PRIVATE_GATEWAY.fetch=function(u,i){assert.equal(this,f.bound.PRIVATE_GATEWAY);return original(u,i);};
  const r=await run(f,{method:'GET',route:'/e06/models',headers:{Cookie:'CF_Authorization=fixture',Host:'evil.example.com','X-Forwarded-Host':'evil.example.com','X-Arbitrary':'private'}});
  assert.equal(r.status,200);assert.equal(f.calls.length,1);const c=f.calls[0];
- assert.equal(c.u,'http://private-gateway.invalid/models');assert.equal(c.i.method,'GET');assert.equal(c.i.body,undefined);assert.equal(c.i.redirect,'error');
+ assert.equal(c.u,'http://private-gateway.invalid/models');assert.equal(c.i.method,'GET');assert.equal(c.i.body,undefined);assert.equal(c.i.redirect,'manual');
  assert.deepEqual(c.i.headers,{'Accept':'application/json','X-TrogNet-Admission':env.ORIGIN_ADMISSION});
 });
 test('E06 VPC absent malformed legacy and throwing bindings never use global or injected fetch',async()=>{
@@ -132,7 +132,7 @@ for(const [name,claims,header] of [
 for(const name of ['OPENAI_API_KEY','CREDITS_FALLBACK','TOKEN_ENCRYPTION_KEY','OWNER_ADMISSION','ACCESS_TOKEN','REFRESH_TOKEN'])test('E06 forbids configuration '+name,async()=>{const f=fixture();f.bound[name]='';assert.equal((await run(f)).status,503);assert.equal(f.calls.length,0);});
 test('E06 browser Cookie and JWT stripped; only reviewed origin headers and route',async()=>{
  const f=fixture();const r=await run(f,{headers:{Cookie:'CF_Authorization=fixture','X-Forwarded-Host':'evil.example.com'}});assert.equal(r.status,200);
- const c=f.calls[0];assert.equal(c.u,'http://private-gateway.invalid/responses');assert.deepEqual(c.i.headers,{'Accept':'application/json','Content-Type':'application/json','X-TrogNet-Admission':env.ORIGIN_ADMISSION,'X-TrogNet-Request-Id':sequenceId(1)});assert.equal(c.i.redirect,'error');assert.equal(c.i.method,'POST');assert.deepEqual(JSON.parse(c.i.body),p());
+ const c=f.calls[0];assert.equal(c.u,'http://private-gateway.invalid/responses');assert.deepEqual(c.i.headers,{'Accept':'application/json','Content-Type':'application/json','X-TrogNet-Admission':env.ORIGIN_ADMISSION,'X-TrogNet-Request-Id':sequenceId(1)});assert.equal(c.i.redirect,'manual');assert.equal(c.i.method,'POST');assert.deepEqual(JSON.parse(c.i.body),p());
  const output=await r.text();assert(!output.includes(env.ORIGIN_ADMISSION));assert(!output.includes(goodJWT));assert.equal(JSON.parse(output).inference,'confirmed');
 });
 test('E06 duplicate request and intent across Worker restart never dispatch',async()=>{

@@ -92,8 +92,8 @@
     },
     {
       "path": "runtime/e06/front-door.mjs",
-      "bytes": 13067,
-      "sha256": "4d044da8a848d9697d9702127715fc8c5e55f95811263d10d5f27ec440ebda36"
+      "bytes": 13068,
+      "sha256": "2202b455fd1b5307b5c8d8dd01cde92f59544b7337a1171718c65b1783e00258"
     },
     {
       "path": "runtime/e06/owner/OWNER_KIT.md",
@@ -472,8 +472,8 @@
     },
     {
       "path": "runtime/tests/e06.test.mjs",
-      "bytes": 30802,
-      "sha256": "68390aea867b833c5188eff2c7e0c0e1810a40882d123d6e4b062ffcf100d176"
+      "bytes": 30804,
+      "sha256": "48161058fcb672e3eabdc4e06c124d293ba8a007d9c4e878791a948169e3b2fe"
     },
     {
       "path": "runtime/tests/public-readers.test.mjs",
