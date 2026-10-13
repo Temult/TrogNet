@@ -82,9 +82,9 @@ test('E06 VPC rejects target path query and absolute URL injection before dispat
 });
 test('E06 VPC deployment example keeps owner placeholders closed and exact service binding',()=>{
  const c=JSON.parse(fs.readFileSync(new URL('../wrangler.e06.example.json',import.meta.url),'utf8'));
- assert.equal(c.name,'trognet-e06-owner-front-door');assert.equal(c.workers_dev,true);assert.equal(c.preview_urls,false);assert.equal(c.vars.ENABLED,'false');
- assert.equal(c.vars.APP_ORIGIN,'https://trognet-e06-owner-front-door.valateve.workers.dev');assert(!Object.hasOwn(c.vars,'ORIGIN_URL'));assert(!Object.hasOwn(c,'vpc_networks'));
- assert.deepEqual(c.vpc_services,[{binding:'PRIVATE_GATEWAY',service_id:'01a10c6d-8025-7163-a6b9-c87a58e11918'}]);assert.equal(c.vars.ACCESS_PUBLIC_KEYS,'[]');
+ assert.equal(c.name,'example-front-door');assert.equal(c.workers_dev,true);assert.equal(c.preview_urls,false);assert.equal(c.vars.ENABLED,'false');
+ assert.equal(c.vars.APP_ORIGIN,'https://example-front-door.example.invalid');assert(!Object.hasOwn(c.vars,'ORIGIN_URL'));assert(!Object.hasOwn(c,'vpc_networks'));
+ assert.deepEqual(c.vpc_services,[{binding:'PRIVATE_GATEWAY',service_id:'00000000-0000-4000-8000-000000000000'}]);assert.equal(c.vars.ACCESS_PUBLIC_KEYS,'[]');
 });
 for(const [name,options,status] of [
  ['unauthenticated',{headers:{'Cf-Access-Jwt-Assertion':''}},401],

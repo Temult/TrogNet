@@ -6,17 +6,17 @@ approved owner deployment window. Do not execute historical E06 host preparation
 1. Verify handoff hashes, exact parent/candidate identities, full Linux Node 22.23.3
    test results and runtime/SOURCE_MANIFEST.json. Build off-host using the lockfile.
 2. Preserve current generation-2 credentials, gateway release, permanent fence,
-   protected state, trognet-origin connector/token, Tailscale-only administration and
+   protected state, example-origin-tunnel connector/token, Tailscale-only administration and
    untouched extractive Portal. Do not rerun archival, Gate 5I, installers or renewal.
 3. Independently inspect existing VPC Service trognet-gateway, ID
-   01a10c6d-8025-7163-a6b9-c87a58e11918: type HTTP, tunnel trognet-origin, IPv4
+   00000000-0000-4000-8000-000000000000: type HTTP, tunnel example-origin-tunnel, IPv4
    127.0.0.1, HTTP port 19456. Check connector health and account VPC availability.
    Metrics/existence alone do not prove target settings. STOP on mismatch; correcting
    the service requires separate owner review. Do not create a VPC Network binding,
    DNS route, public origin, custom domain or replacement tunnel.
 4. Copy runtime/wrangler.e06.example.json to private owner configuration. Keep Worker
-   name trognet-e06-owner-front-door, workers_dev=true, preview_urls=false and
-   APP_ORIGIN=https://trognet-e06-owner-front-door.valateve.workers.dev. Keep ENABLED
+   name example-front-door, workers_dev=true, preview_urls=false and
+   APP_ORIGIN=https://example-front-door.example.invalid. Keep ENABLED
    false. Preserve the REQUESTS class, e06-owner-ledger-v1 object key, migrations and
    existing permanent namespace; never reset or replace ledger storage. Verify any
    existing namespace identity before deployment, STOP if it cannot be established.

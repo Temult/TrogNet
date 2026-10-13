@@ -3,7 +3,7 @@
 - Local source repair and synthetic Linux tests do not establish LIVE_QUALIFIED.
 - Workers VPC is beta. Actual account availability, service routing, fetch/header/Host
   behavior, timeouts and resource limits require owner qualification.
-- Service existence and intended HTTP 127.0.0.1:19456 through trognet-origin are supplied
+- Service existence and intended HTTP 127.0.0.1:19456 through example-origin-tunnel are supplied
   owner context. Independently verify type, tunnel, IPv4 and port before live inference.
 - Effective workers.dev Access policy, trusted public keys, exact owner claims, Worker
   deployment and permanent REQUESTS namespace continuity require owner verification.

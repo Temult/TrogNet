@@ -32,13 +32,13 @@
     },
     {
       "path": "runtime/e06/CURRENT_BASELINE.md",
-      "bytes": 1589,
-      "sha256": "11fb46771b5f72053e6b87fabe75eb114734f8bcab3845bd8138c5c018ff020e"
+      "bytes": 1603,
+      "sha256": "1ef8b05fe7ae4da0a1349a1736afeb3de996d4ee67fdfa67be3df567a7fb0095"
     },
     {
       "path": "runtime/e06/E06_ARCHITECTURE_DECISION.md",
-      "bytes": 2847,
-      "sha256": "945887aa3256bcc021dfe74f076de2d92089ebab812be69fa4b3718eabe22460"
+      "bytes": 2839,
+      "sha256": "73af70fe68a1cef9c5bd1f05700bc1651363888d8fca4ec2347455c3a6c1b4fc"
     },
     {
       "path": "runtime/e06/E06_E_CHECKPOINT.md",
@@ -57,13 +57,13 @@
     },
     {
       "path": "runtime/e06/OPEN_BOUNDARIES_AND_NEXT_STEPS.md",
-      "bytes": 1782,
-      "sha256": "192773ea85088dfd4e259693e3baf1a815e8b495574fe4eee7457507f363e49a"
+      "bytes": 1789,
+      "sha256": "751d768f51ffed6beccb4a3288fc088c8717046a47723d7a7b959fa290c4f8cf"
     },
     {
       "path": "runtime/e06/OWNER_EXECUTION_ORDER.md",
-      "bytes": 4432,
-      "sha256": "ff07672ceceed436980fe728fafb227bbca4b8630680a209041ca01a811d1711"
+      "bytes": 4421,
+      "sha256": "2891ce74ce539defd4e3398467493eb34b23d73f96c7029b44de05625d95d422"
     },
     {
       "path": "runtime/e06/READ_ME_FIRST.md",
@@ -97,8 +97,8 @@
     },
     {
       "path": "runtime/e06/owner/OWNER_KIT.md",
-      "bytes": 4534,
-      "sha256": "24e34dbdc510e22b502d1c3293c772299a7ce480cfd4c36774cd8ec5f809be96"
+      "bytes": 4540,
+      "sha256": "a0562e363141ae4d3cd0b1dea32035db0afbb7f2035bb9e92c54ab58e36f9ed5"
     },
     {
       "path": "runtime/e06/owner/cloudflared.example.yml",
@@ -472,8 +472,8 @@
     },
     {
       "path": "runtime/tests/e06.test.mjs",
-      "bytes": 30804,
-      "sha256": "48161058fcb672e3eabdc4e06c124d293ba8a007d9c4e878791a948169e3b2fe"
+      "bytes": 30779,
+      "sha256": "1c305565fa270eafc4c6fa4cebc03b8c4a624800d681f9f5aeb2ff3e22112383"
     },
     {
       "path": "runtime/tests/public-readers.test.mjs",
@@ -502,8 +502,8 @@
     },
     {
       "path": "runtime/wrangler.e06.example.json",
-      "bytes": 773,
-      "sha256": "be4049454dac2d3aaa5f5bff6d6fa3079f99b7c5efb3d8bbb31b043e013e4643"
+      "bytes": 748,
+      "sha256": "de5c52fc00d03ba8d11130a8e0324a47bdb859397d547486e6800a95718aeb3d"
     },
     {
       "path": "runtime/wrangler.owner-plan-staging.example.json",

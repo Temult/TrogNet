@@ -13,3 +13,7 @@ Future runtime credential persistence, refresh, encryption, redaction, retention
 deletion, and local projection access require E05R1 review. There is no implementation
 or guarantee of these behaviors in this scaffold. Keep all review evidence and
 owner-specific receipts outside the repository.
+
+## Public deployment examples
+
+E06 hostnames, tunnel names and Cloudflare service identifiers in public source and tests are intentionally non-live examples. Configure your own identifiers outside the public repository. The sample Worker URL uses the reserved .invalid domain, and the example VPC Service UUID is not a real resource. These templates are not directly deployable.

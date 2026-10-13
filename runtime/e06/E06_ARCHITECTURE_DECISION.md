@@ -3,11 +3,11 @@
 Chosen: a separate Access-authenticated Worker, a single owner Durable Object for
 serialized request admission and persistent intent/attempt records. E06R1 replaces the
 public HTTPS origin with PRIVATE_GATEWAY, a Workers VPC Service binding to service
-01a10c6d-8025-7163-a6b9-c87a58e11918 (trognet-gateway). The browser front door is
-https://trognet-e06-owner-front-door.valateve.workers.dev, protected by Cloudflare Access.
+00000000-0000-4000-8000-000000000000 (trognet-gateway). The browser front door is
+https://example-front-door.example.invalid, protected by Cloudflare Access.
 No custom DNS zone or public origin hostname is required. The registered service fixes
 the backend target; http://private-gateway.invalid is synthetic Request URL/Host input
-only. Intended backend: trognet-origin -> HTTP 127.0.0.1:19456, owner verification OPEN.
+only. Intended backend: example-origin-tunnel -> HTTP 127.0.0.1:19456, owner verification OPEN.
 Only /models and /responses cross the binding. ORIGIN_URL presence fails closed;
 no global fetch fallback or VPC Network binding exists. No existing Portal binding changes.
 Worker validates RS256 Access JWTs against owner-pinned public verification keys,
